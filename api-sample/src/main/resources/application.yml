@@ -1,0 +1,32 @@
+server:
+  port: 9600
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/seeyouletter?serverTimezone=UTC&useSSL=false&allowPublicKeyRetrieval=true
+    username: app
+    password: 1234
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: create
+      use-new-id-generator-mappings: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        default_batch_fetch_size: 1000
+        format_sql: true
+    open-in-view: false
+  data:
+    mongodb:
+      uri: mongodb://app:1234@localhost:27017/seeyouletter
+
+logging:
+  level:
+    org:
+      hibernate:
+        SQL: DEBUG
+        type:
+          descriptor:
+            sql:
+              BasicBinder: TRACE

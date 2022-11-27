@@ -1,0 +1,20 @@
+bootJar {
+    enabled = false
+}
+
+jar {
+    enabled = true
+}
+
+def testContainersVersion = '1.17.6'
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-autoconfigure'
+    implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
+    annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
+    testImplementation "org.testcontainers:mongodb:${testContainersVersion}"
+    testImplementation "org.testcontainers:junit-jupiter:${testContainersVersion}"
+    testImplementation('org.springframework.boot:spring-boot-starter-test') {
+        exclude group: 'org.junit.vintage:junit-vintage-engine'
+    }
+}

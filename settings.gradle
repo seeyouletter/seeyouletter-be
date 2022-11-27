@@ -1,0 +1,4 @@
+rootProject.name = 'seeyouletter'
+include 'api-sample'
+include 'domain-sample'
+include 'domain-sample2'

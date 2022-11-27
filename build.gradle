@@ -1,0 +1,123 @@
+plugins {
+    id 'org.springframework.boot' version "2.7.6"
+    id "org.asciidoctor.jvm.convert" version "3.3.2"
+    id 'com.github.kt3k.coveralls' version '2.12.0'
+    id 'io.spring.dependency-management' version '1.1.0'
+    id 'jacoco'
+}
+
+allprojects {
+    apply plugin: 'com.github.kt3k.coveralls'
+    apply plugin: 'jacoco'
+
+    repositories {
+        mavenCentral()
+    }
+}
+
+subprojects {
+    apply plugin: 'java'
+    apply plugin: 'checkstyle'
+    apply plugin: 'org.springframework.boot'
+    apply plugin: 'io.spring.dependency-management'
+    apply plugin: 'org.asciidoctor.jvm.convert'
+
+    group = 'com.seeyouletter'
+    sourceCompatibility = '11'
+
+    def snippetsDir = file('build/generated-snippets')
+
+    repositories {
+        mavenCentral()
+    }
+
+    configurations {
+        compileOnly {
+            extendsFrom annotationProcessor
+        }
+    }
+
+    dependencies {
+        annotationProcessor 'org.projectlombok:lombok'
+        implementation 'org.projectlombok:lombok'
+        testImplementation 'org.mockito:mockito-inline'
+    }
+
+    jacocoTestReport {
+        dependsOn test
+        reports {
+            xml.required = true
+            html.required = true
+        }
+    }
+
+    checkstyle {
+        ignoreFailures true
+        showViolations false
+        configFile = file("${rootDir}/check_style.xml")
+        toolVersion = "8.40"
+    }
+
+    checkstyleMain {
+        source = "src/main/java"
+    }
+
+    checkstyleTest {
+        source = "src/test/java"
+    }
+
+    asciidoctor {
+        inputs.dir snippetsDir
+        dependsOn test
+    }
+
+    jar {
+        enabled = false
+    }
+
+    task copyDocument(type: Copy) {
+        dependsOn bootJar
+        from file("build/docs/asciidoc")
+        into file("src/main/resources/static/docs")
+    }
+
+    bootJar {
+        dependsOn asciidoctor
+        duplicatesStrategy = DuplicatesStrategy.INCLUDE
+        from("build/docs/asciidoc") {
+            into 'BOOT-INF/classes/static/docs'
+        }
+        finalizedBy(copyDocument)
+    }
+
+    asciidoctor.doFirst {
+        delete file('src/main/resources/static/docs')
+    }
+
+    test {
+        useJUnitPlatform()
+        outputs.dir snippetsDir
+    }
+
+    clean {
+        delete file('src/main/generated')
+    }
+
+}
+
+task jacocoRootReport(type: JacocoReport) {
+    description = 'Generates an aggregate report from all subprojects'
+    dependsOn subprojects.test
+    sourceDirectories.setFrom(files(subprojects.sourceSets.main.allSource.srcDirs))
+    classDirectories.setFrom(files(subprojects.sourceSets.main.output))
+    executionData.setFrom(files(subprojects.jacocoTestReport.executionData))
+    reports {
+        xml.required = true
+        html.required = true
+    }
+}
+
+coveralls {
+    sourceDirs = subprojects.sourceSets.main.allSource.srcDirs.flatten()
+    jacocoReportPath = "${buildDir}/reports/jacoco/jacocoRootReport/jacocoRootReport.xml"
+}
