@@ -1,0 +1,28 @@
+version: '3.9'
+
+services:
+  postgresql:
+    image: postgres:14.5-alpine
+    container_name: postgresql
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_USER: app
+      POSTGRES_PASSWORD: 1234
+      POSTGRES_DB: seeyouletter
+    volumes:
+      - ~/docker/postgresql/data/:/var/lib/postgresql/data
+  mongo:
+    image: mongo:5.0.14
+    container_name: mongo
+    ports:
+      - 27017:27017
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: 1234
+      MONGO_INITDB_DATABASE: seeyouletter
+    volumes:
+      - ~/docker/mongo/data:/data/db
+      - ./mongo/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+
+
