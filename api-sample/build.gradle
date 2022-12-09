@@ -4,7 +4,8 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
-    testRuntimeOnly(testFixtures(project(":domain-sample")))
+    testRuntimeOnly testFixtures(project(":domain-sample"))
+    testImplementation testFixtures(project(":domain-sample2"))
     testImplementation('org.springframework.boot:spring-boot-starter-test') {
         exclude group: 'org.junit.vintage:junit-vintage-engine'
     }

@@ -1,7 +1,7 @@
-package com.seeyouletter.domain_sample2;
+package com.seeyouletter.api_sample;
 
 import org.junit.jupiter.api.Disabled;
-import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
@@ -11,10 +11,10 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 
 @Disabled
-@DataMongoTest
+@SpringBootTest
 @Testcontainers
 @ActiveProfiles(profiles = "test")
-public abstract class MongoTestContext {
+public abstract class IntegrationTestContext {
 
     @Container
     private static final MongoDBContainer MONGODB_CONTAINER;

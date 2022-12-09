@@ -1,3 +1,7 @@
+plugins {
+    id 'java-test-fixtures'
+}
+
 bootJar {
     enabled = false
 }
@@ -12,8 +16,8 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-autoconfigure'
     implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
     annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
-    testImplementation "org.testcontainers:mongodb:${testContainersVersion}"
-    testImplementation "org.testcontainers:junit-jupiter:${testContainersVersion}"
+    testFixturesApi "org.testcontainers:mongodb:${testContainersVersion}"
+    testFixturesApi "org.testcontainers:junit-jupiter:${testContainersVersion}"
     testImplementation('org.springframework.boot:spring-boot-starter-test') {
         exclude group: 'org.junit.vintage:junit-vintage-engine'
     }
