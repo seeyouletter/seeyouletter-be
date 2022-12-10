@@ -5,11 +5,11 @@ on:
     branches:
       - main
       - develop
-  paths:
-    - api-sample/**
-    - domain-sample/**
-    - domain-sample2/**
-    - build.gradle
+    paths:
+      - api-sample/**
+      - domain-sample/**
+      - domain-sample2/**
+      - build.gradle
 
 jobs:
   build:
