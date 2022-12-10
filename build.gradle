@@ -111,6 +111,7 @@ task jacocoRootReport(type: JacocoReport) {
     sourceDirectories.setFrom(files(subprojects.sourceSets.main.allSource.srcDirs))
     classDirectories.setFrom(files(subprojects.sourceSets.main.output))
     executionData.setFrom(files(subprojects.jacocoTestReport.executionData))
+
     reports {
         xml.required = true
         html.required = true
