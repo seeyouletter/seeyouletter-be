@@ -1,4 +1,5 @@
 # SeeYouLetter Backend
+[![Coverage Status](https://coveralls.io/repos/github/seeyouletter/seeyouletter-be/badge.svg?branch=master&service=github)](https://coveralls.io/github/seeyouletter/seeyouletter-be?branch=master)
 ___
 ## introduce
 ___
