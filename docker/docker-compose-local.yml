@@ -1,6 +1,15 @@
 version: '3.9'
 
 services:
+  localstack:
+    image: localstack/localstack
+    container_name: localstack
+    ports:
+      - 4566:4566
+    environment:
+      SERVICES: s3
+    volumes:
+      - ./localstack:/docker-entrypoint-initaws.d
   postgresql:
     image: postgres:14.5-alpine
     container_name: postgresql
@@ -11,7 +20,7 @@ services:
       POSTGRES_PASSWORD: 1234
       POSTGRES_DB: seeyouletter
     volumes:
-      - ~/docker/postgresql/data/:/var/lib/postgresql/data
+      - ~/docker/postgresql/data:/var/lib/postgresql/data
   mongo:
     image: mongo:5.0.14
     container_name: mongo

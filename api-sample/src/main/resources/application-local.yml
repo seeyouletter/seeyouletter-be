@@ -10,7 +10,6 @@ spring:
   jpa:
     hibernate:
       ddl-auto: create
-      use-new-id-generator-mappings: false
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
@@ -20,6 +19,11 @@ spring:
   data:
     mongodb:
       uri: mongodb://app:1234@localhost:27017/seeyouletter
+
+aws:
+  endpoint: http://127.0.0.1:4566
+  s3:
+    region: local
 
 logging:
   level:
