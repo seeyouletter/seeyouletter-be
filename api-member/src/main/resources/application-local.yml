@@ -1,0 +1,38 @@
+server:
+  port: 8600
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/seeyouletter?serverTimezone=UTC&useSSL=false&allowPublicKeyRetrieval=true
+    username: app
+    password: 1234
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: create
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        default_batch_fetch_size: 1000
+        format_sql: true
+    open-in-view: false
+
+aws:
+  endpoint: http://127.0.0.1:4566
+  s3:
+    region: local
+
+logging:
+  level:
+    org:
+      springframework:
+        data:
+          mongodb:
+            core:
+              MongoTemplate: DEBUG
+      hibernate:
+        SQL: DEBUG
+        type:
+          descriptor:
+            sql:
+              BasicBinder: TRACE
