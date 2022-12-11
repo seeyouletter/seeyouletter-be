@@ -1,5 +1,5 @@
 rootProject.name = 'seeyouletter'
-include 'api-sample'
 include 'api-member'
+include 'api-letter'
 include 'domain-member'
-include 'domain-sample2'
+include 'domain-letter'
