@@ -1,4 +1,4 @@
-name: api-sample-pull-request
+name: api-member-pull-request
 
 on:
   pull_request:
@@ -6,8 +6,8 @@ on:
       - main
       - develop
     paths:
-      - api-sample/**
-      - domain-sample2/**
+      - api-member/**
+      - domain-member/**
       - build.gradle
 
 jobs:
@@ -28,4 +28,4 @@ jobs:
         run: chmod +x ./gradlew
 
       - name: Build
-        run:  ./gradlew :api-sample:build
+        run:  ./gradlew :api-member:build
