@@ -16,7 +16,7 @@ body:
     attributes:
       label: "멈춰! 🖐🏻 잠시 체크 들어갑니다~"
       options:
-        - label: "[다음 페이지](https://github.com/seeyouletter/seeyouletter-be/issue)에서 중복되지 않음을 확인했어요. 🙆🏻"
+        - label: "[다음 페이지](https://github.com/seeyouletter/seeyouletter-be/issues)에서 중복되지 않음을 확인했어요. 🙆🏻"
           required: true
         - label: "다른 분들께서 허락해주신다면, 제가 구현해보고 싶어요! 🙆🏻‍♀️"
           required: false

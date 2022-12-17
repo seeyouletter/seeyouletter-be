@@ -16,9 +16,9 @@ body:
     attributes:
       label: "멈춰! 🖐🏻 잠시 체크 들어갑니다~"
       options:
-        - label: "[다음 페이지](https://github.com/seeyouletter/seeyouletter-be/issue)에서 중복되지 않음을 확인했어요. 🙆🏻"
+        - label: "[다음 페이지](https://github.com/seeyouletter/seeyouletter-be/issues)에서 중복되지 않음을 확인했어요. 🙆🏻"
           required: true
-        - label: "클라이언트 쪽 문제일 경우, [프론트엔드 레포지토리](https://github.com/seeyouletter/seeyouletter-be)도 확인해보셨나요?"
+        - label: "클라이언트 쪽 문제일 경우, [프론트엔드 레포지토리](https://github.com/seeyouletter/seeyouletter-fe)도 확인해보셨나요?"
           required: true
         - label: "사안을 볼 때 매우 위험해요. 빠른 수정이 필요해요! 😖"
           required: false
