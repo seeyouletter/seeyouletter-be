@@ -1,0 +1,23 @@
+{
+  "name": "seeyouletter-be",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "prepare": "husky install",
+    "commit": "cz"
+  },
+  "devDependencies": {
+    "@changesets/cli": "^2.25.2",
+    "commitizen": "^4.2.6",
+    "cz-customizable": "^7.0.0",
+    "husky": "^8.0.0"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "config": {
+    "commitizen": {
+      "path": "cz-customizable"
+    }
+  }
+}
