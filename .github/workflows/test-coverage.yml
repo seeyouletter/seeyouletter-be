@@ -5,6 +5,15 @@ on:
     branches:
       - main
       - develop
+    paths:
+      - api-member/**
+      - api-letter/**
+      - domain-member/**
+      - domain-letter/**
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   build:
@@ -22,6 +31,12 @@ jobs:
 
       - name: Grant execute permission for gradlew
         run: chmod +x ./gradlew
+
+      - name: Setup Gradle
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: build
+          cache-read-only: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/develop' }}
 
       - name: Build & Upload coverage to Coveralls
         env:
