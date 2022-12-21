@@ -76,6 +76,8 @@ module.exports = {
         "README",
         "RESTDOCS",
         "CHANGELOG",
+
+        "pr-review",
     ],
     allowCustomScopes: true,
 };

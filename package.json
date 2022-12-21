@@ -3,8 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "prepare": "husky install",
-    "commit": "cz"
+    "prepare": "husky install"
   },
   "devDependencies": {
     "@changesets/cli": "^2.25.2",
@@ -14,10 +13,5 @@
   },
   "engines": {
     "node": ">=16.0.0"
-  },
-  "config": {
-    "commitizen": {
-      "path": "cz-customizable"
-    }
   }
 }
