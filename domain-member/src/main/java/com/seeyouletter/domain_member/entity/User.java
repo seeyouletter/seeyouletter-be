@@ -4,10 +4,8 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
+import java.util.Date;
 
 @Entity
 @Getter
@@ -19,10 +17,38 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(length = 50, nullable = false)
     private String email;
 
-    public Users(String email) {
+    @Column(length = 20, nullable = true)
+    private String password;
+
+    @Column(length = 15, nullable = true)
+    private String phone;
+
+    @Column(length = 1, nullable = false)
+    private String gender;
+
+    @Column(nullable = false)
+    @Temporal(value = TemporalType.TIMESTAMP)
+    private Date birth;
+
+    @Column(length = 200, nullable = true)
+    private String howJoin;
+
+    @Column(nullable = true)
+    @Temporal(value = TemporalType.TIMESTAMP)
+    private Date regDate;
+
+    @Column(nullable = true)
+    @Temporal(value = TemporalType.TIMESTAMP)
+    private Date lastAccess;
+
+    public User(String email, String phone, String gender, Date birth) {
         this.email = email;
+        this.phone = phone;
+        this.gender = gender;
+        this.birth = birth;
     }
 
 }
