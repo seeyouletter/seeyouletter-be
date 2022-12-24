@@ -6,7 +6,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 
-class UsersTest {
+class UserTest {
 
     @Test
     void instantiate() {
@@ -14,7 +14,7 @@ class UsersTest {
         String email = "dev.sinbom@gmail.com";
 
         // when
-        Users user = new Users(email);
+        User user = new User(email, phone, gender, birth);
 
         // then
         assertThat(user.getEmail(), is(equalTo(email)));
