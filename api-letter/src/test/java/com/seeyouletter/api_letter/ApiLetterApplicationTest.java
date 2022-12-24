@@ -7,6 +7,8 @@ import com.seeyouletter.domain_letter.repository.LetterRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.sql.Date;
+
 class ApiLetterApplicationTest extends IntegrationTestContext {
 
     @Autowired
@@ -20,7 +22,12 @@ class ApiLetterApplicationTest extends IntegrationTestContext {
         Letter letter = new Letter("청첩장");
         letterRepository.save(letter);
 
-        User user = new User("dev.sinbom@gmail.com");
+        String email = "dev.sinbom@gmail.com";
+        String phone = "01011111111";
+        String gender = "W";
+        Date birth = new Date(System.currentTimeMillis());
+
+        User user = new User(email, phone, gender, birth);
         usersRepository.save(user);
     }
 
