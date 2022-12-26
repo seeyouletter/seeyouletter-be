@@ -1,13 +1,13 @@
 package com.seeyouletter.api_letter;
 
-import com.seeyouletter.domain_member.entity.User;
-import com.seeyouletter.domain_member.repository.UserRepository;
 import com.seeyouletter.domain_letter.collection.Letter;
 import com.seeyouletter.domain_letter.repository.LetterRepository;
+import com.seeyouletter.domain_member.entity.User;
+import com.seeyouletter.domain_member.repository.UserRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.sql.Date;
+import java.time.LocalDate;
 
 class ApiLetterApplicationTest extends IntegrationTestContext {
 
@@ -24,8 +24,8 @@ class ApiLetterApplicationTest extends IntegrationTestContext {
 
         String email = "dev.sinbom@gmail.com";
         String phone = "01011111111";
-        String gender = "W";
-        Date birth = new Date(System.currentTimeMillis());
+        String gender = "M";
+        LocalDate birth = LocalDate.of(1996, 9, 17);
 
         User user = new User(email, phone, gender, birth);
         usersRepository.save(user);

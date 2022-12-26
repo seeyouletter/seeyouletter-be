@@ -5,7 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.util.Date;
+import java.time.LocalDate;
 
 @Entity
 @Getter
@@ -30,21 +30,18 @@ public class User {
     private String gender;
 
     @Column(nullable = false)
-    @Temporal(value = TemporalType.TIMESTAMP)
-    private Date birth;
+    private LocalDate birth;
 
     @Column(length = 200, nullable = true)
     private String howJoin;
 
     @Column(nullable = true)
-    @Temporal(value = TemporalType.TIMESTAMP)
-    private Date regDate;
+    private LocalDate regDate;
 
     @Column(nullable = true)
-    @Temporal(value = TemporalType.TIMESTAMP)
-    private Date lastAccess;
+    private LocalDate lastAccess;
 
-    public User(String email, String phone, String gender, Date birth) {
+    public User(String email, String phone, String gender, LocalDate birth) {
         this.email = email;
         this.phone = phone;
         this.gender = gender;

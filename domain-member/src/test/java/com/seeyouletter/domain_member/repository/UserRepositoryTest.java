@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
-import java.sql.Date;
+import java.time.LocalDate;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
@@ -19,8 +19,8 @@ class UserRepositoryTest {
     User createUser(){
         String email = "dev.sinbom@gmail.com";
         String phone = "01011111111";
-        String gender = "W";
-        Date birth = new Date(System.currentTimeMillis());
+        String gender = "M";
+        LocalDate birth = LocalDate.of(1996, 9, 17);
 
         return new User(email, phone, gender, birth);
     }
