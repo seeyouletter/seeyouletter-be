@@ -1,5 +1,6 @@
 package com.seeyouletter.domain_member.entity;
 
+import com.seeyouletter.domain_member.enums.GenderType;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
@@ -15,16 +16,16 @@ class UserTest {
         // given
         String email = "dev.sinbom@gmail.com";
         String phone = "01011111111";
-        String gender = "M";
+        GenderType genderType = GenderType.MALE;
         LocalDate birth = LocalDate.of(1996, 9, 17);
 
         // when
-        User user = new User(email, phone, gender, birth);
+        User user = new User(email, phone, genderType, birth);
 
         // then
         assertThat(user.getEmail(), is(equalTo(email)));
         assertThat(user.getPhone(), is(equalTo(phone)));
-        assertThat(user.getGender(), is(equalTo(gender)));
+        assertThat(user.getGenderType(), is(equalTo(genderType)));
         assertThat(user.getBirth(), is(equalTo(birth)));
     }
 

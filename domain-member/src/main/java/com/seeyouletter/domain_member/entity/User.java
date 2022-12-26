@@ -1,5 +1,7 @@
 package com.seeyouletter.domain_member.entity;
 
+import com.seeyouletter.domain_member.enums.GenderType;
+import com.seeyouletter.domain_member.enums.converter.GenderTypeConverter;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -26,8 +28,9 @@ public class User {
     @Column(length = 15, nullable = true)
     private String phone;
 
-    @Column(length = 1, nullable = false)
-    private String gender;
+    @Column(nullable = false)
+    @Convert(converter = GenderTypeConverter.class)
+    private GenderType genderType;
 
     @Column(nullable = false)
     private LocalDate birth;
@@ -41,10 +44,10 @@ public class User {
     @Column(nullable = true)
     private LocalDate lastAccess;
 
-    public User(String email, String phone, String gender, LocalDate birth) {
+    public User(String email, String phone, GenderType genderType, LocalDate birth) {
         this.email = email;
         this.phone = phone;
-        this.gender = gender;
+        this.genderType = genderType;
         this.birth = birth;
     }
 

@@ -1,6 +1,7 @@
 package com.seeyouletter.domain_member.repository;
 
 import com.seeyouletter.domain_member.entity.User;
+import com.seeyouletter.domain_member.enums.GenderType;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
@@ -19,10 +20,10 @@ class UserRepositoryTest {
     User createUser(){
         String email = "dev.sinbom@gmail.com";
         String phone = "01011111111";
-        String gender = "M";
+        GenderType genderType = GenderType.MALE;
         LocalDate birth = LocalDate.of(1996, 9, 17);
 
-        return new User(email, phone, gender, birth);
+        return new User(email, phone, genderType, birth);
     }
     @Test
     void save() {
@@ -35,7 +36,7 @@ class UserRepositoryTest {
         // then
         assertThat(savedUser.getEmail(), is(equalTo(user.getEmail())));
         assertThat(savedUser.getPhone(), is(equalTo(user.getPhone())));
-        assertThat(savedUser.getGender(), is(equalTo(user.getGender())));
+        assertThat(savedUser.getGenderType(), is(equalTo(user.getGenderType())));
         assertThat(savedUser.getBirth(), is(equalTo(user.getBirth())));
         assertThat(savedUser.getId(), is(notNullValue()));
     }
