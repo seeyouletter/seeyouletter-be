@@ -23,7 +23,12 @@ class UserRepositoryTest {
         GenderType genderType = GenderType.MALE;
         LocalDate birth = LocalDate.of(1996, 9, 17);
 
-        return new User(email, phone, genderType, birth);
+        return User.withDefault()
+                .email(email)
+                .phone(phone)
+                .genderType(genderType)
+                .birth(birth)
+                .build();
     }
     @Test
     void save() {
