@@ -1,7 +1,3 @@
-aws:
-  s3:
-    region: test
-
 logging:
   level:
     org:

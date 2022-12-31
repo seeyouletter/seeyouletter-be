@@ -13,7 +13,6 @@ import org.testcontainers.utility.DockerImageName;
 @Disabled
 @DataMongoTest
 @Testcontainers
-@ActiveProfiles(profiles = "test")
 public abstract class MongoTestContext {
 
     @Container
