@@ -1,8 +1,8 @@
 package com.seeyouletter.domain_member.config;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import com.seeyouletter.domain_member.entity.Users;
-import com.seeyouletter.domain_member.repository.UsersRepository;
+import com.seeyouletter.domain_member.entity.User;
+import com.seeyouletter.domain_member.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
@@ -17,8 +17,8 @@ import javax.persistence.EntityManager;
 public class DomainMemberAutoConfiguration {
 
     @Configuration
-    @EntityScan(basePackageClasses = {Users.class})
-    @EnableJpaRepositories(basePackageClasses = {UsersRepository.class})
+    @EntityScan(basePackageClasses = {User.class})
+    @EnableJpaRepositories(basePackageClasses = {UserRepository.class})
     @RequiredArgsConstructor
     public static class JpaConfiguration {
 

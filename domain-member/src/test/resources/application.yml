@@ -1,0 +1,23 @@
+spring:
+  jpa:
+    show-sql: true
+  output:
+    ansi:
+      enabled: always
+
+
+
+logging:
+  level:
+    org:
+      springframework:
+        data:
+          mongodb:
+            core:
+              MongoTemplate: DEBUG
+      hibernate:
+        SQL: DEBUG
+        type:
+          descriptor:
+            sql:
+              BasicBinder: TRACE
