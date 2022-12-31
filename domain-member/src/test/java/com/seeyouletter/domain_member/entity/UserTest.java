@@ -20,7 +20,12 @@ class UserTest {
         LocalDate birth = LocalDate.of(1996, 9, 17);
 
         // when
-        User user = new User(email, phone, genderType, birth);
+        User user = User.builder()
+                .email(email)
+                .phone(phone)
+                .genderType(genderType)
+                .birth(birth)
+                .build();
 
         // then
         assertThat(user.getEmail(), is(equalTo(email)));

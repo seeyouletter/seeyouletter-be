@@ -25,11 +25,11 @@ public class User {
     @Column(length = 50, nullable = false)
     private String email;
 
-    @Column(length = 20, nullable = true)
+    @Column(length = 20)
     private String password;
 
     @NotNull
-    @Column(length = 15, nullable = true)
+    @Column(length = 15)
     private String phone;
 
     @NotNull
@@ -47,12 +47,17 @@ public class User {
 
     private LocalDate lastAccess;
 
-    @Builder(builderClassName = "defaultUser", builderMethodName = "withDefault")
-    public User(String email, String phone, GenderType genderType, LocalDate birth) {
+    @Builder
+    public User(Long id, String email, String password, String phone, GenderType genderType, LocalDate birth, String howJoin, LocalDate regDate, LocalDate lastAccess) {
+        this.id = id;
         this.email = email;
+        this.password = password;
         this.phone = phone;
         this.genderType = genderType;
         this.birth = birth;
+        this.howJoin = howJoin;
+        this.regDate = regDate;
+        this.lastAccess = lastAccess;
     }
 
 }

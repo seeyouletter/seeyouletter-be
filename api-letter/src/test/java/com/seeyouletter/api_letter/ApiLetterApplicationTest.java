@@ -28,7 +28,7 @@ class ApiLetterApplicationTest extends IntegrationTestContext {
         GenderType genderType = GenderType.MALE;
         LocalDate birth = LocalDate.of(1996, 9, 17);
 
-        User user = User.withDefault()
+        User user = User.builder()
                 .email(email)
                 .phone(phone)
                 .genderType(genderType)
