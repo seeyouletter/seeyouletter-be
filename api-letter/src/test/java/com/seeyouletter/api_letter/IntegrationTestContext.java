@@ -1,10 +1,16 @@
 package com.seeyouletter.api_letter;
 
 import org.junit.jupiter.api.Disabled;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.restdocs.operation.preprocess.OperationRequestPreprocessor;
+import org.springframework.restdocs.operation.preprocess.OperationResponsePreprocessor;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.test.web.servlet.MockMvc;
 import org.testcontainers.containers.MongoDBContainer;
 import org.testcontainers.containers.localstack.LocalStackContainer;
 import org.testcontainers.junit.jupiter.Container;
@@ -13,10 +19,15 @@ import org.testcontainers.utility.DockerImageName;
 
 import java.nio.file.Paths;
 
+import static org.springframework.http.HttpHeaders.*;
+import static org.springframework.http.HttpHeaders.CONTENT_LENGTH;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
 import static org.testcontainers.containers.BindMode.READ_ONLY;
 import static org.testcontainers.containers.localstack.LocalStackContainer.Service.S3;
 
 @Disabled
+@AutoConfigureMockMvc
+@AutoConfigureRestDocs
 @SpringBootTest
 @Testcontainers
 @ActiveProfiles(profiles = "test")
@@ -36,9 +47,18 @@ public abstract class IntegrationTestContext {
 
     private static final String LOCAL_STACK_IMAGE = "localstack/localstack";
 
+    public static final OperationRequestPreprocessor REQUEST_PREPROCESSOR;
+
+    public static final OperationResponsePreprocessor RESPONSE_PREPROCESSOR;
+
+    @Autowired
+    protected MockMvc mockMvc;
+
     static {
         MONGODB_CONTAINER = createMongoDBContainer();
         LOCAL_STACK_CONTAINER = createLocalStackContainer();
+        REQUEST_PREPROCESSOR = createRequestPreprocessor();
+        RESPONSE_PREPROCESSOR = createResponsePreprocessor();
     }
 
     private static MongoDBContainer createMongoDBContainer() {
@@ -76,6 +96,34 @@ public abstract class IntegrationTestContext {
         return DockerImageName
                 .parse(LOCAL_STACK_IMAGE)
                 .withTag(LOCAL_STACK_VERSION);
+    }
+
+    private static OperationRequestPreprocessor createRequestPreprocessor() {
+        return preprocessRequest(
+                removeHeaders(
+                        "X-Forwarded-Host",
+                        "X-Forwarded-Proto",
+                        CONTENT_LENGTH
+                ),
+                modifyParameters()
+                        .remove("_csrf"),
+                prettyPrint()
+        );
+    }
+
+    private static OperationResponsePreprocessor createResponsePreprocessor() {
+        return preprocessResponse(
+                prettyPrint(),
+                removeHeaders(
+                        "X-Content-Type-Options",
+                        "X-XSS-Protection",
+                        "X-Frame-Options",
+                        "Pragma",
+                        CACHE_CONTROL,
+                        EXPIRES,
+                        CONTENT_LENGTH
+                )
+        );
     }
 
     @DynamicPropertySource

@@ -6,7 +6,6 @@ class ApiLetterApplicationTest extends IntegrationTestContext {
 
     @Test
     void contextLoads() {
-
     }
 
 }
