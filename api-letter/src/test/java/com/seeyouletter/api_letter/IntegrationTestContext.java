@@ -62,7 +62,7 @@ public abstract class IntegrationTestContext {
     }
 
     private static MongoDBContainer createMongoDBContainer() {
-        return new MongoDBContainer(createDockerImageName());
+        return new MongoDBContainer(createMongoDBDockerImageName());
     }
 
     private static LocalStackContainer createLocalStackContainer() {
@@ -86,7 +86,7 @@ public abstract class IntegrationTestContext {
                 .toString();
     }
 
-    private static DockerImageName createDockerImageName() {
+    private static DockerImageName createMongoDBDockerImageName() {
         return DockerImageName
                 .parse(MONGODB_IMAGE)
                 .withTag(MONGODB_VERSION);
