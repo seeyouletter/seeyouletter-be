@@ -16,6 +16,9 @@ public class SecurityConfiguration {
 
     @Bean
     public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity httpSecurity) throws Exception {
+        httpSecurity
+                .oauth2Login();
+
         return httpSecurity
                 .authorizeRequests()
                 .anyRequest()
