@@ -74,6 +74,7 @@ logging:
     org:
       springframework:
         security: DEBUG
+        security.jackson2: INFO
       hibernate:
         SQL: DEBUG
         type:

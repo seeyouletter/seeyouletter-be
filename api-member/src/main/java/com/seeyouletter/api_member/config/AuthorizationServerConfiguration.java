@@ -7,14 +7,12 @@ import com.nimbusds.jose.proc.SecurityContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.oauth2.server.resource.OAuth2ResourceServerConfigurer;
-import org.springframework.security.oauth2.core.oidc.endpoint.OidcParameterNames;
 import org.springframework.security.oauth2.jwt.JwtClaimsSet;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
-import org.springframework.security.oauth2.server.authorization.InMemoryOAuth2AuthorizationService;
 import org.springframework.security.oauth2.server.authorization.OAuth2AuthorizationService;
-import org.springframework.security.oauth2.server.authorization.OAuth2TokenType;
 import org.springframework.security.oauth2.server.authorization.client.InMemoryRegisteredClientRepository;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClient;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClientRepository;
@@ -66,7 +64,7 @@ public class AuthorizationServerConfiguration {
         Set<String> allowedOidcScopes = Set.of(OPENID, PROFILE, EMAIL, ADDRESS, PHONE);
         Set<String> allowedCustomScopes = Set.of("user.read", "user.write");
 
-        RegisteredClient registeredClient = withId(randomUUID().toString())
+        RegisteredClient registeredClient = withId("98348f89-5433-41a1-b12d-657f4f3d19f9")
                 .clientId("seeyouletter")
                 .clientAuthenticationMethod(NONE)
                 .authorizationGrantType(AUTHORIZATION_CODE)
@@ -88,9 +86,9 @@ public class AuthorizationServerConfiguration {
     }
 
     @Bean
-    public OAuth2AuthorizationService authorizationService() {
-        // TODO Implement Custom service
-        return new InMemoryOAuth2AuthorizationService();
+    public OAuth2AuthorizationService authorizationService(StringRedisTemplate stringRedisTemplate,
+                                                           RegisteredClientRepository registeredClientRepository) {
+        return new RedisOauth2AuthorizationService(stringRedisTemplate, registeredClientRepository);
     }
 
     @Bean
