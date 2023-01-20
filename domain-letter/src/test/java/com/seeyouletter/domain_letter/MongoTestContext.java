@@ -2,20 +2,15 @@ package com.seeyouletter.domain_letter;
 
 import org.junit.jupiter.api.Disabled;
 import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.MongoDBContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 
 @Disabled
 @DataMongoTest
-@Testcontainers
 public abstract class MongoTestContext {
 
-    @Container
     private static final MongoDBContainer MONGODB_CONTAINER;
 
     private static final String MONGODB_VERSION = "5.0.14";
@@ -24,6 +19,7 @@ public abstract class MongoTestContext {
 
     static {
         MONGODB_CONTAINER = createMongoDBContainer();
+        MONGODB_CONTAINER.start();
     }
 
     private static MongoDBContainer createMongoDBContainer() {
