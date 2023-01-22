@@ -25,7 +25,7 @@ spring:
         registration:
           naver:
             clientId: JQVLu74QpBZbothfyFs9
-            clientSecret: C_JOlfJ3Bp
+            clientSecret: ENC(FSm1doVFr2RG97uyspaJpI9/qkAl21mz)
             clientAuthenticationMethod: post
             authorizationGrantType: authorization_code
             redirectUri: http://localhost:8600/login/oauth2/code/naver
@@ -40,7 +40,7 @@ spring:
             clientName: Naver
           kakao:
             clientId: 77b675771f4b505fae6f51e25086e80f
-            clientSecret: JUTVCTPFVvjqSLpg6lm8edL8KdfBMpbb
+            clientSecret: ENC(rNGXN3onQN+TLtHB+a8HTD6l6aF5Jj0m3UNdOjwqoGFeJ3O/OygGA3gg+smPZKR7)
             clientAuthenticationMethod: post
             authorizationGrantType: authorization_code
             redirectUri: http://localhost:8600/login/oauth2/code/kakao
@@ -69,6 +69,10 @@ aws:
   endpoint: http://127.0.0.1:4566
   s3:
     region: local
+
+jasypt:
+  encryptor:
+    bean: jasyptStringEncryptor
 
 logging:
   level:
