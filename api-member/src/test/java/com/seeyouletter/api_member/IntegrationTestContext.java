@@ -14,8 +14,6 @@ import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 import org.testcontainers.containers.GenericContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 
 import static org.springframework.http.HttpHeaders.*;
@@ -26,11 +24,9 @@ import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
 @AutoConfigureMockMvc
 @AutoConfigureRestDocs
 @SpringBootTest
-@Testcontainers
 @ActiveProfiles(value = "test")
 public abstract class IntegrationTestContext {
 
-    @Container
     private static final GenericContainer<?> REDIS_CONTAINER;
 
     private static final String REDIS_VERSION = "7.0.5";
@@ -51,6 +47,7 @@ public abstract class IntegrationTestContext {
         REDIS_CONTAINER = createRedisContainer();
         REQUEST_PREPROCESSOR = createRequestPreprocessor();
         RESPONSE_PREPROCESSOR = createResponsePreprocessor();
+        REDIS_CONTAINER.start();
     }
 
     private static GenericContainer<?> createRedisContainer() {

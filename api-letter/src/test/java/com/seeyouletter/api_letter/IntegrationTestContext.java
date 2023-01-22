@@ -13,14 +13,11 @@ import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.testcontainers.containers.MongoDBContainer;
 import org.testcontainers.containers.localstack.LocalStackContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 
 import java.nio.file.Paths;
 
 import static org.springframework.http.HttpHeaders.*;
-import static org.springframework.http.HttpHeaders.CONTENT_LENGTH;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
 import static org.testcontainers.containers.BindMode.READ_ONLY;
 import static org.testcontainers.containers.localstack.LocalStackContainer.Service.S3;
@@ -29,14 +26,11 @@ import static org.testcontainers.containers.localstack.LocalStackContainer.Servi
 @AutoConfigureMockMvc
 @AutoConfigureRestDocs
 @SpringBootTest
-@Testcontainers
 @ActiveProfiles(profiles = "test")
 public abstract class IntegrationTestContext {
 
-    @Container
     private static final MongoDBContainer MONGODB_CONTAINER;
 
-    @Container
     public static final LocalStackContainer LOCAL_STACK_CONTAINER;
 
     private static final String MONGODB_VERSION = "5.0.14";
@@ -59,6 +53,8 @@ public abstract class IntegrationTestContext {
         LOCAL_STACK_CONTAINER = createLocalStackContainer();
         REQUEST_PREPROCESSOR = createRequestPreprocessor();
         RESPONSE_PREPROCESSOR = createResponsePreprocessor();
+        MONGODB_CONTAINER.start();
+        LOCAL_STACK_CONTAINER.start();
     }
 
     private static MongoDBContainer createMongoDBContainer() {

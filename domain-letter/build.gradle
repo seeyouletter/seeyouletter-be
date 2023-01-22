@@ -15,7 +15,6 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
     annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
     testFixturesApi 'org.testcontainers:mongodb:1.17.6'
-    testFixturesApi 'org.testcontainers:junit-jupiter:1.17.6'
     testImplementation('org.springframework.boot:spring-boot-starter-test') {
         exclude group: 'org.junit.vintage:junit-vintage-engine'
     }
