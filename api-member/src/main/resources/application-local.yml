@@ -16,6 +16,11 @@ spring:
         default_batch_fetch_size: 1000
         format_sql: true
     open-in-view: false
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:${server.port}
 
 aws:
   endpoint: http://127.0.0.1:4566
@@ -25,6 +30,8 @@ aws:
 logging:
   level:
     org:
+      springframework:
+        security: DEBUG
       hibernate:
         SQL: DEBUG
         type:

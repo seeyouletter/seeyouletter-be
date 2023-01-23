@@ -33,5 +33,12 @@ services:
     volumes:
       - ~/docker/mongo/data:/data/db
       - ./mongo/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+  redis:
+    image: redis:7.0.5
+    container_name: redis
+    ports:
+      - 6379:6379
+    volumes:
+      - ~/docker/redis/data:/data
 
 

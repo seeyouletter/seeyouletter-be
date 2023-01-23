@@ -5,6 +5,11 @@ spring:
   data:
     mongodb:
       uri: mongodb://app:1234@localhost:27017/seeyouletter
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8600
 
 aws:
   endpoint: http://127.0.0.1:4566
