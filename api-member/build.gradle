@@ -18,7 +18,4 @@ dependencies {
     testImplementation('org.springframework.boot:spring-boot-starter-test') {
         exclude group: 'org.junit.vintage:junit-vintage-engine'
     }
-    test {
-        systemProperty "jasypt.encryptor.password", System.getProperties().get("jasypt.encryptor.password")
-    }
 }

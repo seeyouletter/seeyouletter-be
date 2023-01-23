@@ -42,4 +42,6 @@ jobs:
             ${{ runner.os }}-gradle-
 
       - name: Build
-        run:  ./gradlew :api-member:clean :api-member:build
+        env:
+          ENCRYPTION_KEY: ${{secrets.ENCRYPTION_KEY}}
+        run: ./gradlew :api-member:clean :api-member:build
