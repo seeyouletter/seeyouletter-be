@@ -21,8 +21,8 @@ spring:
       client:
         registration:
           naver:
-            clientId: JQVLu74QpBZbothfyFs9
-            clientSecret: ENC(FSm1doVFr2RG97uyspaJpI9/qkAl21mz)
+            clientId: naverclientId
+            clientSecret: naverclientSecret
             clientAuthenticationMethod: post
             authorizationGrantType: authorization_code
             redirectUri: http://localhost:8600/login/oauth2/code/naver
@@ -36,8 +36,8 @@ spring:
               - mobile
             clientName: Naver
           kakao:
-            clientId: 77b675771f4b505fae6f51e25086e80f
-            clientSecret: ENC(rNGXN3onQN+TLtHB+a8HTD6l6aF5Jj0m3UNdOjwqoGFeJ3O/OygGA3gg+smPZKR7)
+            clientId: kakaoclientId
+            clientSecret: kakaoclientSecret
             clientAuthenticationMethod: post
             authorizationGrantType: authorization_code
             redirectUri: http://localhost:8600/login/oauth2/code/kakao

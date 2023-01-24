@@ -9,7 +9,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
-import java.util.LinkedHashMap;
+import java.util.Map;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -19,7 +19,7 @@ public class NaverAttributes implements OauthAttributes{
 
     private String message;
 
-    private LinkedHashMap<String, String> response;
+    private Map<String, String> response;
 
     @Override
     public OauthUser convertOauthUser() {
