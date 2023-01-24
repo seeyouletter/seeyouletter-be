@@ -5,15 +5,14 @@ import org.jasypt.encryption.pbe.PooledPBEStringEncryptor;
 import org.jasypt.encryption.pbe.config.SimpleStringPBEConfig;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 
 @Configuration
 public class JasyptConfig {
 
-//    @Value("${jasypt.encryptor.password}")
-//    private String encryptKey;
-
     public static final String ENV_JASYPT_KEY = "ENCRYPTION_KEY";
 
+    @Profile("!test")
     @Bean("jasyptStringEncryptor")
     public StringEncryptor stringEncryptor(){
         PooledPBEStringEncryptor encryptor = new PooledPBEStringEncryptor();

@@ -8,12 +8,10 @@ import java.util.Arrays;
 @Getter
 @AllArgsConstructor
 public enum GenderType {
-    MALE("M", "male"),
-    FEMALE("F", "female");
+    MALE("M"),
+    FEMALE("F");
 
     private final String type;
-
-    private final String kakaoType;
 
     public static GenderType find(String code){
         return Arrays.stream(GenderType.values())
@@ -22,10 +20,4 @@ public enum GenderType {
                 .orElseThrow(() -> new IllegalArgumentException("잘못된 성별타입 입니다."));
     }
 
-    public static GenderType findKakao(String code){
-        return Arrays.stream(GenderType.values())
-                .filter(x->x.getKakaoType().equals(code))
-                .findAny()
-                .orElseThrow(() -> new IllegalArgumentException("잘못된 성별타입 입니다."));
-    }
 }

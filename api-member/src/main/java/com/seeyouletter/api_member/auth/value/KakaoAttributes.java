@@ -10,7 +10,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
-import java.util.LinkedHashMap;
+import java.util.Map;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -20,9 +20,9 @@ public class KakaoAttributes implements OauthAttributes{
 
     private String connectedAt;
 
-    private LinkedHashMap<String, String> properties;
+    private Map<String, String> properties;
 
-    private LinkedHashMap<String, Object> kakaoAccount;
+    private Map<String, Object> kakaoAccount;
 
     @Override
     public OauthUser convertOauthUser() {
@@ -30,7 +30,7 @@ public class KakaoAttributes implements OauthAttributes{
                 .name(properties.get("nickname"))
                 .email((String) kakaoAccount.get("email"))
                 .profileImage(properties.get("profile_image"))
-                .genderType(GenderType.findKakao((String) kakaoAccount.get("gender")))
+                .genderType(convertGender((String) kakaoAccount.get("gender")))
                 .regDate(LocalDateTime.now())
                 .lastAccess(LocalDateTime.now())
                 .build();
@@ -41,5 +41,17 @@ public class KakaoAttributes implements OauthAttributes{
             OauthType.KAKAO,
             user
         );
+    }
+
+    private GenderType convertGender(String gender){
+        if("male".equals(gender)){
+            return GenderType.find("M");
+        }
+
+        if("female".equals(gender)){
+            return GenderType.find("F");
+        }
+
+        throw new IllegalArgumentException("잘못된 성별타입 입니다.");
     }
 }
