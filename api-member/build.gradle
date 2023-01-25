@@ -6,6 +6,8 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.data:spring-data-redis'
     implementation 'org.springframework.security:spring-security-oauth2-authorization-server:0.4.0'
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
+    implementation 'com.github.ulisesbocchio:jasypt-spring-boot-starter:3.0.5'
     runtimeOnly 'io.lettuce:lettuce-core'
     testImplementation "org.testcontainers:localstack:1.17.6"
     testImplementation platform('com.amazonaws:aws-java-sdk-bom:1.12.360')
