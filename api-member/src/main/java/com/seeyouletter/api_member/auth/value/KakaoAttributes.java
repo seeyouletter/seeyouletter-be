@@ -45,11 +45,11 @@ public class KakaoAttributes implements OauthAttributes{
 
     private GenderType convertGender(String gender){
         if("male".equals(gender)){
-            return GenderType.find("M");
+            return GenderType.MALE;
         }
 
         if("female".equals(gender)){
-            return GenderType.find("F");
+            return GenderType.FEMALE;
         }
 
         throw new IllegalArgumentException("잘못된 성별타입 입니다.");
