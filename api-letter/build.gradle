@@ -5,6 +5,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
     implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
+    implementation 'com.github.ulisesbocchio:jasypt-spring-boot-starter:3.0.5'
     testImplementation "org.testcontainers:localstack:1.17.6"
     testImplementation platform('com.amazonaws:aws-java-sdk-bom:1.12.360')
     testImplementation "com.amazonaws:aws-java-sdk-s3"

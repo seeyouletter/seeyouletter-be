@@ -68,7 +68,11 @@ public class AuthorizationServerConfiguration {
                 .clientId("seeyouletter")
                 .clientAuthenticationMethod(NONE)
                 .authorizationGrantType(AUTHORIZATION_CODE)
-                .redirectUri("http://127.0.0.1:8600/authorized")
+                .redirectUris(redirectUris -> {
+                    redirectUris.add("http://127.0.0.1:8600/authorized");
+                    redirectUris.add("http://127.0.0.1:2462/auth/redirect");
+                    redirectUris.add("https://seeyouletter.kr/auth/redirect");
+                })
                 .scopes(scopes -> {
                     scopes.addAll(allowedOidcScopes);
                     scopes.addAll(allowedCustomScopes);
