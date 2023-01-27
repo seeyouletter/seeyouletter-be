@@ -6,6 +6,8 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
@@ -14,7 +16,6 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
-import static org.springframework.security.config.Customizer.withDefaults;
 
 @EnableWebSecurity
 public class SecurityConfiguration {
@@ -33,7 +34,10 @@ public class SecurityConfiguration {
                 .anyRequest()
                 .authenticated()
                 .and()
-                .formLogin(withDefaults())
+                .formLogin()
+                .defaultSuccessUrl("/")
+                .usernameParameter("email")
+                .and()
                 .build();
     }
 
@@ -71,6 +75,11 @@ public class SecurityConfiguration {
         source.registerCorsConfiguration("/**", configuration);
 
         return source;
+    }
+
+    @Bean
+    public PasswordEncoder getPasswordEncoder() {
+        return new BCryptPasswordEncoder();
     }
 
 
