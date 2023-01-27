@@ -39,6 +39,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.springframework.http.HttpHeaders.*;
 import static org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED;
+import static org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED_VALUE;
 import static org.springframework.restdocs.headers.HeaderDocumentation.*;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
@@ -155,7 +156,7 @@ class Oauth2AuthorizationTest extends IntegrationTestContext {
                                 requestParameters(
                                         parameterWithName("client_id").description("클라이언트 id"),
                                         parameterWithName("code").description("인가 코드"),
-                                        parameterWithName("code_verifier").description("해시 원본 값").optional(),
+                                        parameterWithName("code_verifier").description("해시 원본 값"),
                                         parameterWithName("grant_type").description("인증 방식, authorization_code 고정으로 사용"),
                                         parameterWithName("redirect_uri").description("리다이렉트 callback uri")
                                 ),
@@ -353,6 +354,9 @@ class Oauth2AuthorizationTest extends IntegrationTestContext {
                                 "userinfo",
                                 REQUEST_PREPROCESSOR,
                                 RESPONSE_PREPROCESSOR,
+                                requestHeaders(
+                                        headerWithName(AUTHORIZATION).description("Bearer {access_token}")
+                                ),
                                 responseHeaders(
                                         headerWithName(CONTENT_TYPE).description(CONTENT_TYPE)
                                 ),
