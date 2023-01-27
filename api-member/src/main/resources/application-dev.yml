@@ -3,9 +3,9 @@ server:
 
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/seeyouletter?serverTimezone=UTC&useSSL=false&allowPublicKeyRetrieval=true
-    username: app
-    password: 1234
+    url: ENC(XtqMO6KzspZXczHkLSg5qATICavsuQrK/mVCyfzmCpR3D9myQPVIAxQ7y6njtz/Cq01VtCTL/7FNymNNuFBLCnPNvFWdjGepFJ53pGvpiaX1QAejvomzPVKN5MAppTj8YjVmVBL4xhJjijB+VLg5jITRaiRzsZPPas+gAFq/GbHPJjD5jqYkXKTjyjY/ODt0fhvszJspLms4TpllK+TZjTjZM5DlG8PLL0ny2Ih8bKitps+6JvB4jA==)
+    username: ENC(JSLUGXjwqAjx5qhMQhpQvoCb1ezUg/EF)
+    password: ENC(VQNpUTFSOAhEaLNcRbrzR0kDHSc2fJyNarbtjYEeU6I=)
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
@@ -16,6 +16,8 @@ spring:
         default_batch_fetch_size: 1000
         format_sql: true
     open-in-view: false
+  redis:
+    host: ENC(c9oB4rht7QricGx0PBvgEhaEqd829uenF5X24wqHBRvQtuWEiT1NYpWHB7K6sqLtgj/XdO9Rzz49OsDhhQ3PIc9KzR3h6ieIsXCEA54BGrz+lcVtpy558A==)
   security:
     oauth2:
       resourceserver:
@@ -64,15 +66,9 @@ spring:
             userInfoUri: https://kapi.kakao.com/v2/user/me
             userNameAttribute: id
 
-
 aws:
-  endpoint: http://127.0.0.1:4566
   s3:
-    region: local
-
-jasypt:
-  encryptor:
-    bean: jasyptStringEncryptor
+    region: ap-northeast-2
 
 logging:
   level:

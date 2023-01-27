@@ -1,0 +1,25 @@
+server:
+  port: 9600
+
+spring:
+  data:
+    mongodb:
+      uri: ENC(B6N1fuqVs+7QwHrBlbguImrVU8RV5JS97mC9s+ByJo12JqqJiaI8Mk2agv+3TLHUrVTGn8Dqqir+66EJFkxKcb5jZ81MvRULRYc0s9MqrOVscl42FCOm+hfPYUN5yNgJSnEFpiWd0iY1thFJB5pFoCgBZ0TEL+1KxU06j76AeNzGq2iioe0kVQ==)
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ENC(QQCJsa8AgP/c42gSwzioF8fRJRtRw9b7xer1emmTxc0=)
+
+aws:
+  s3:
+    region: ap-northeast-2
+
+logging:
+  level:
+    org:
+      springframework:
+        data:
+          mongodb:
+            core:
+              MongoTemplate: DEBUG

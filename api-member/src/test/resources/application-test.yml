@@ -18,16 +18,63 @@ spring:
       resourceserver:
         jwt:
           issuer-uri: http://localhost:${server.port}
+      client:
+        registration:
+          naver:
+            clientId: naverclientId
+            clientSecret: naverclientSecret
+            clientAuthenticationMethod: post
+            authorizationGrantType: authorization_code
+            redirectUri: http://localhost:8600/login/oauth2/code/naver
+            scope:
+              - nickname
+              - email
+              - profile_image
+              - gender
+              - birthyear
+              - birthday
+              - mobile
+            clientName: Naver
+          kakao:
+            clientId: kakaoclientId
+            clientSecret: kakaoclientSecret
+            clientAuthenticationMethod: post
+            authorizationGrantType: authorization_code
+            redirectUri: http://localhost:8600/login/oauth2/code/kakao
+            scope:
+              - profile_nickname
+              - account_email
+              - profile_image
+              - gender
+              - birthday
+            clientName: Kakao
+
+        provider:
+          naver:
+            authorizationUri: https://nid.naver.com/oauth2.0/authorize
+            tokenUri: https://nid.naver.com/oauth2.0/token
+            userInfoUri: https://openapi.naver.com/v1/nid/me
+            userNameAttribute: response
+          kakao:
+            authorizationUri: https://kauth.kakao.com/oauth/authorize
+            tokenUri: https://kauth.kakao.com/oauth/token
+            userInfoUri: https://kapi.kakao.com/v2/user/me
+            userNameAttribute: id
 
 aws:
   s3:
     region: test
+
+jasypt:
+  encryptor:
+    bean: jasyptStringEncryptor
 
 logging:
   level:
     org:
       springframework:
         security: DEBUG
+        security.jackson2: INFO
       hibernate:
         SQL: DEBUG
         type:

@@ -1,0 +1,134 @@
+= Oauth2 Authorization Server REST API Document
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 4
+:sectlinks:
+
+ifndef::snippets[]
+:snippets: ./build/generated-snippets
+endif::[]
+
+seeyouletter 서비스를 구성하는 웹 애플리케이션들의 인증 및 인가를 처리하는 인증 서버는 `Oauth2`, `OIDC` 를 구현합니다. 리소스 서버는 인증 서버에서 발급한 엑세스 토큰으로 권한에 대한 인가를 수행할 수 있습니다. 인증 서버는 `third-party` 가 아닌 `first-party` 클라이언트에서의 사용이 목적이므로 클라이언트를 등록하는 엔드포인트는 제외되었습니다.
+
+NOTE: 2023-01-25 작성일 기준으로 `public-client` 인 SPA에서만 서비스를 지원하는 시점에서 작성된 문서입니다.
+
+[[authorization]]
+== 인가
+
+리소스 서버에서 인가를 처리할 수 있는 토큰을 발급받을 수 있는 접근 토큰을 발급합니다.
+
+인증 서버에 로그인된 세션에서만 접근할 수 있으므로 로그인이 필요합니다. 인가 요청 가능한 `scope` 는 아래와 같습니다.
+
+|===
+| value | description
+
+| user.read | 유저 정보 조회
+| user.write | 유저 정보 생성/수정/삭제
+| openid | ID 토큰(OIDC scope)
+| profile | 프로필(OIDC scope)
+| email | 이메일(OIDC scope)
+| address | 주소(OIDC scope)
+|===
+
+=== HTTP request
+include::{snippets}/authorization/http-request.adoc[]
+
+=== Request parameters
+include::{snippets}/authorization/request-parameters.adoc[]
+
+=== HTTP response
+include::{snippets}/authorization/http-response.adoc[]
+
+=== Request headers
+include::{snippets}/authorization/response-headers.adoc[]
+
+[[token]]
+== 토큰 발급
+
+리소스 서버에서 인가를 처리할 수 있는 토큰을 발급합니다.
+
+인가 요청의 응답에서 리다이렉트된 경로에 포함된 접근 토큰인 `code` 로 엑세스 토큰 발급을 요청합니다.
+
+=== HTTP request
+include::{snippets}/token/http-request.adoc[]
+
+=== Request headers
+include::{snippets}/token/request-headers.adoc[]
+
+=== Request parameters
+include::{snippets}/token/request-parameters.adoc[]
+
+=== HTTP response
+include::{snippets}/token/http-response.adoc[]
+
+=== Request headers
+include::{snippets}/token/response-headers.adoc[]
+
+=== Response fields
+include::{snippets}/token/response-fields.adoc[]
+
+[[introspect]]
+== 토큰 정보
+
+인증 서버에서 발급한 엑세스 토큰에 대한 정보를 조회합니다.
+
+=== HTTP request
+include::{snippets}/introspect/http-request.adoc[]
+
+=== Request headers
+include::{snippets}/introspect/request-headers.adoc[]
+
+=== Request parameters
+include::{snippets}/introspect/request-parameters.adoc[]
+
+=== HTTP response
+include::{snippets}/introspect/http-response.adoc[]
+
+=== Request headers
+include::{snippets}/introspect/response-headers.adoc[]
+
+=== Response fields
+include::{snippets}/introspect/response-fields.adoc[]
+
+[[revoke]]
+== 토큰 무효화
+
+인증 서버에서 발급한 엑세스 토큰을 무효화합니다.
+
+NOTE: JWT 토큰은 `self-contained` 특성을 가지기 때문에 인증 서버에서 무효화하더라도 서명이 일치하고 유효기간이 지나지 않았다면 리소스 서버에서는 유효한 토큰으로 인식할 수 있습니다.
+
+=== HTTP request
+include::{snippets}/revoke/http-request.adoc[]
+
+=== Request headers
+include::{snippets}/revoke/request-headers.adoc[]
+
+=== Request parameters
+include::{snippets}/revoke/request-parameters.adoc[]
+
+=== HTTP response
+include::{snippets}/revoke/http-response.adoc[]
+
+[[userinfo]]
+== 유저 정보
+
+인증 서버에서 토큰을 발급한 유저의 정보를 조회합니다.
+
+NOTE: 유저 정보에 대한 명세를 구체화함에 따라 응답 필드는 지속적으로 추가될 예정입니다.
+
+=== HTTP request
+include::{snippets}/userinfo/http-request.adoc[]
+
+=== Request headers
+include::{snippets}/userinfo/request-headers.adoc[]
+
+=== HTTP response
+include::{snippets}/userinfo/http-response.adoc[]
+
+=== Request headers
+include::{snippets}/userinfo/response-headers.adoc[]
+
+=== Response fields
+include::{snippets}/userinfo/response-fields.adoc[]

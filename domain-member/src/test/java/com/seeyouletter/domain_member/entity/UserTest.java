@@ -4,6 +4,7 @@ import com.seeyouletter.domain_member.enums.GenderType;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -14,6 +15,7 @@ class UserTest {
     @Test
     void instantiate() {
         // given
+        String name = "신영진";
         String email = "dev.sinbom@gmail.com";
         String phone = "01011111111";
         GenderType genderType = GenderType.MALE;
@@ -21,10 +23,12 @@ class UserTest {
 
         // when
         User user = User.builder()
+                .name(name)
                 .email(email)
                 .phone(phone)
                 .genderType(genderType)
                 .birth(birth)
+                .regDate(LocalDateTime.now())
                 .build();
 
         // then

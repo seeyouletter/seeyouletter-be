@@ -7,14 +7,15 @@ import java.util.Arrays;
 
 @Getter
 @AllArgsConstructor
-public enum GenderType {
-    MALE("M"),
-    FEMALE("F");
+public enum OauthType {
+
+    KAKAO("kakao"),
+    NAVER("naver");
 
     private final String type;
 
-    public static GenderType find(String code){
-        return Arrays.stream(GenderType.values())
+    public static OauthType find(String code){
+        return Arrays.stream(OauthType.values())
                 .filter(x->x.getType().equals(code))
                 .findAny()
                 .orElseThrow(() -> new IllegalArgumentException("잘못된 성별타입 입니다."));
