@@ -16,6 +16,13 @@ ___
 ```
 
 ## Running
+
+### 애플리케이션 실행에 필요한 컨테이너 생성
+```shell
+docker-compose -f docker/docker-compose-local.yml up -d
+```
+
+### 애플리케이션 실행
 ```shell
 ./gradlew clean bootRun
 ```
