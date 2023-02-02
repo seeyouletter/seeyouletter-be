@@ -23,6 +23,7 @@ import org.springframework.security.oauth2.server.authorization.settings.ClientS
 import org.springframework.security.oauth2.server.authorization.token.JwtEncodingContext;
 import org.springframework.security.oauth2.server.authorization.token.OAuth2TokenCustomizer;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.cors.CorsConfigurationSource;
 
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
@@ -47,10 +48,14 @@ public class AuthorizationServerConfiguration {
 
     @Bean
     @Order(value = HIGHEST_PRECEDENCE)
-    public SecurityFilterChain authorizationServerSecurityFilterChain(HttpSecurity httpSecurity) throws Exception {
+    public SecurityFilterChain authorizationServerSecurityFilterChain(HttpSecurity httpSecurity,
+                                                                      CorsConfigurationSource corsConfigurationSource) throws Exception {
         applyDefaultSecurity(httpSecurity);
 
         return httpSecurity
+                .cors()
+                .configurationSource(corsConfigurationSource)
+                .and()
                 .getConfigurer(OAuth2AuthorizationServerConfigurer.class)
                 .oidc(withDefaults())
                 .and()
