@@ -68,16 +68,14 @@ public class AuthorizationServerConfiguration {
     public RegisteredClientRepository registeredClientRepository() {
         Set<String> allowedOidcScopes = Set.of(OPENID, PROFILE, EMAIL, ADDRESS, PHONE);
         Set<String> allowedCustomScopes = Set.of("user.read", "user.write");
+        Set<String> allowedRedirectUris = Set.of("http://127.0.0.1:8600/authorized", "https://dev-member.seeyouletter.kr");
+
 
         RegisteredClient registeredClient = withId("98348f89-5433-41a1-b12d-657f4f3d19f9")
                 .clientId("seeyouletter")
                 .clientAuthenticationMethod(NONE)
                 .authorizationGrantType(AUTHORIZATION_CODE)
-                .redirectUris(redirectUris -> {
-                    redirectUris.add("http://127.0.0.1:8600/authorized");
-                    redirectUris.add("http://127.0.0.1:2462/auth/redirect");
-                    redirectUris.add("https://seeyouletter.kr/auth/redirect");
-                })
+                .redirectUris(redirectUris -> redirectUris.addAll(allowedRedirectUris))
                 .scopes(scopes -> {
                     scopes.addAll(allowedOidcScopes);
                     scopes.addAll(allowedCustomScopes);

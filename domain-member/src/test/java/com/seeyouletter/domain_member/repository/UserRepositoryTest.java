@@ -9,8 +9,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
 class UserRepositoryTest {
@@ -18,7 +17,7 @@ class UserRepositoryTest {
     @Autowired
     private UserRepository userRepository;
 
-    User createUser(){
+    User createUser() {
         String name = "신영진";
         String email = "dev.sinbom@gmail.com";
         String phone = "01011111111";
@@ -34,6 +33,7 @@ class UserRepositoryTest {
                 .regDate(LocalDateTime.now())
                 .build();
     }
+
     @Test
     void save() {
         // given
@@ -43,11 +43,11 @@ class UserRepositoryTest {
         User savedUser = userRepository.save(user);
 
         // then
-        assertThat(savedUser.getEmail(), is(equalTo(user.getEmail())));
-        assertThat(savedUser.getPhone(), is(equalTo(user.getPhone())));
-        assertThat(savedUser.getGenderType(), is(equalTo(user.getGenderType())));
-        assertThat(savedUser.getBirth(), is(equalTo(user.getBirth())));
-        assertThat(savedUser.getId(), is(notNullValue()));
+        assertThat(savedUser.getEmail()).isEqualTo(user.getEmail());
+        assertThat(savedUser.getPhone()).isEqualTo(user.getPhone());
+        assertThat(savedUser.getGenderType()).isEqualTo(user.getGenderType());
+        assertThat(savedUser.getBirth()).isEqualTo(user.getBirth());
+        assertThat(savedUser.getId()).isNotNull();
     }
 
     @Test
@@ -59,7 +59,7 @@ class UserRepositoryTest {
         User foundUser = userRepository.findById(savedUser.getId()).get();
 
         // then
-        assertThat(savedUser.getEmail(), is(equalTo(foundUser.getEmail())));
+        assertThat(savedUser.getEmail()).isEqualTo(foundUser.getEmail());
     }
 
 }

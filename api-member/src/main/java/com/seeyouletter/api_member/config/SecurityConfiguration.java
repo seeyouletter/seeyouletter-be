@@ -60,6 +60,7 @@ public class SecurityConfiguration {
         configuration.setAllowedOrigins(
                 asList(
                         "http://localhost:2462",
+                        "http://127.0.0.1:9600",
                         "http://127.0.0.1:2462",
                         "https://seeyouletter.kr"
                 )
