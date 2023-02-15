@@ -5,8 +5,7 @@ import com.seeyouletter.domain_letter.collection.Letter;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 class LetterRepositoryTest extends MongoTestContext {
 
@@ -23,8 +22,8 @@ class LetterRepositoryTest extends MongoTestContext {
         letterRepository.save(letter);
 
         // then
-        assertThat(letter.getTitle(), is(equalTo(title)));
-        assertThat(letter.getId(), is(notNullValue()));
+        assertThat(letter.getTitle()).isEqualTo(title);
+        assertThat(letter.getId()).isNotNull();
     }
 
 }

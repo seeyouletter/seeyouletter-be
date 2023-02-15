@@ -2,9 +2,7 @@ package com.seeyouletter.domain_letter.collection;
 
 import org.junit.jupiter.api.Test;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.is;
+import static org.assertj.core.api.Assertions.assertThat;
 
 class LetterTest {
 
@@ -17,7 +15,7 @@ class LetterTest {
         Letter letter = new Letter(title);
 
         // then
-        assertThat(letter.getTitle(), is(equalTo(title)));
+        assertThat(letter.getTitle()).isEqualTo(title);
     }
 
 }

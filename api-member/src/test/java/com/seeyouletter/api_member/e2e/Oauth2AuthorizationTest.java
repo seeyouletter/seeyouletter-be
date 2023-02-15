@@ -35,11 +35,9 @@ import static java.nio.charset.StandardCharsets.US_ASCII;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.security.MessageDigest.getInstance;
 import static java.util.UUID.randomUUID;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.http.HttpHeaders.*;
 import static org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED;
-import static org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED_VALUE;
 import static org.springframework.restdocs.headers.HeaderDocumentation.*;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
@@ -120,8 +118,8 @@ class Oauth2AuthorizationTest extends IntegrationTestContext {
 
         Map<String, String> queryStrings = parseRedirectQueryString(authorizationResult);
 
-        assertThat(queryStrings.get("state"), is(equalTo(state)));
-        assertThat(queryStrings.get("code"), is(not(emptyOrNullString())));
+        assertThat(queryStrings.get("state")).isEqualTo(state);
+        assertThat(queryStrings.get("code")).isNotEmpty();
     }
 
     @Test
@@ -177,7 +175,7 @@ class Oauth2AuthorizationTest extends IntegrationTestContext {
         Map<String, Object> fields = parsePayloadFields(tokenResult);
         Jwt idToken = jwtDecoder.decode((String) fields.get("id_token"));
 
-        assertThat(nonce, is(equalTo(idToken.getClaim("nonce"))));
+        assertThat(nonce).isEqualTo(idToken.getClaim("nonce"));
     }
 
     @Test
@@ -397,17 +395,17 @@ class Oauth2AuthorizationTest extends IntegrationTestContext {
                                                       String state,
                                                       String nonce) throws Exception {
         return mockMvc.perform(
-                get("/oauth2/authorize")
-                        .with(csrf())
-                        .queryParam("client_id", clientId)
-                        .queryParam("redirect_uri", redirectUri)
-                        .queryParam("scope", scope)
-                        .queryParam("response_type", "code")
-                        .queryParam("code_challenge", codeChallenge)
-                        .queryParam("code_challenge_method", "S256")
-                        .queryParam("state", state)
-                        .queryParam("nonce", nonce)
-        )
+                        get("/oauth2/authorize")
+                                .with(csrf())
+                                .queryParam("client_id", clientId)
+                                .queryParam("redirect_uri", redirectUri)
+                                .queryParam("scope", scope)
+                                .queryParam("response_type", "code")
+                                .queryParam("code_challenge", codeChallenge)
+                                .queryParam("code_challenge_method", "S256")
+                                .queryParam("state", state)
+                                .queryParam("nonce", nonce)
+                )
                 .andExpect(status().is3xxRedirection())
                 .andDo(print());
     }

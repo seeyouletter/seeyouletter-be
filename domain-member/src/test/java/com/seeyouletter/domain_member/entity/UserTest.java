@@ -6,9 +6,8 @@ import org.junit.jupiter.api.Test;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.is;
+import static org.assertj.core.api.Assertions.assertThat;
+
 
 class UserTest {
 
@@ -32,10 +31,10 @@ class UserTest {
                 .build();
 
         // then
-        assertThat(user.getEmail(), is(equalTo(email)));
-        assertThat(user.getPhone(), is(equalTo(phone)));
-        assertThat(user.getGenderType(), is(equalTo(genderType)));
-        assertThat(user.getBirth(), is(equalTo(birth)));
+        assertThat(user.getEmail()).isEqualTo(email);
+        assertThat(user.getPhone()).isEqualTo(phone);
+        assertThat(user.getGenderType()).isEqualTo(genderType);
+        assertThat(user.getBirth()).isEqualTo(birth);
     }
 
 }
