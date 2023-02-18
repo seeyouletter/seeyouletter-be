@@ -30,7 +30,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
     private final OauthUserRepository oauthUserRepository;
 
-    private static final String CANNOT_FIND_PROVIDER = "connot find provider";
+    private static final String CANNOT_FIND_PROVIDER = "cannot find provider";
 
 
     private final ObjectMapper objectMapper = new Jackson2ObjectMapperBuilder()
