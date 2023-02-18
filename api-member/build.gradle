@@ -14,6 +14,7 @@ dependencies {
     testImplementation platform('com.amazonaws:aws-java-sdk-bom:1.12.360')
     testImplementation "com.amazonaws:aws-java-sdk-s3"
     testImplementation testFixtures(project(":domain-member"))
+    testImplementation "org.springframework.cloud:spring-cloud-starter-contract-stub-runner"
     testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
     testImplementation 'org.springframework.security:spring-security-test'
     testImplementation('org.springframework.boot:spring-boot-starter-test') {

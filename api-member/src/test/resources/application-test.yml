@@ -54,14 +54,14 @@ spring:
 
         provider:
           naver:
-            authorizationUri: https://nid.naver.com/oauth2.0/authorize
-            tokenUri: https://nid.naver.com/oauth2.0/token
-            userInfoUri: https://openapi.naver.com/v1/nid/me
+            authorizationUri: http://localhost:${wiremock.server.port}/naver/oauth2.0/authorize
+            tokenUri: http://localhost:${wiremock.server.port}/naver/oauth2.0/token
+            userInfoUri: http://localhost:${wiremock.server.port}/naver/v1/nid/me
             userNameAttribute: response
           kakao:
-            authorizationUri: https://kauth.kakao.com/oauth/authorize
-            tokenUri: https://kauth.kakao.com/oauth/token
-            userInfoUri: https://kapi.kakao.com/v2/user/me
+            authorizationUri: http://localhost:${wiremock.server.port}/kakao/oauth/authorize
+            tokenUri: http://localhost:${wiremock.server.port}/kakao/oauth/token
+            userInfoUri: http://localhost:${wiremock.server.port}/kakao/v2/user/me
             userNameAttribute: id
 
 first:

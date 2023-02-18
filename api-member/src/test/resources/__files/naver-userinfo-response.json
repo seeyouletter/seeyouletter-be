@@ -1,0 +1,15 @@
+{
+  "resultcode": "00",
+  "message": "success",
+  "response": {
+    "id": "ykwV19NdnLCefV4I2aPnRKA2IlcU1VKdvUyRLVg3awc",
+    "age": "20-29",
+    "gender": "M",
+    "email": "nmrhtn7898@naver.com",
+    "mobile": "010-3115-7613",
+    "mobile_e164": "+821031157613",
+    "name": "신영진",
+    "birthday": "09-17",
+    "birthyear": "1996"
+  }
+}
