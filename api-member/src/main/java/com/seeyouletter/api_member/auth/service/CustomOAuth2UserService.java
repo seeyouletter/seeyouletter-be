@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.seeyouletter.api_member.auth.value.KakaoAttributes;
 import com.seeyouletter.api_member.auth.value.NaverAttributes;
 import com.seeyouletter.api_member.auth.value.OauthAttributes;
+import com.seeyouletter.api_member.auth.config.PrincipalDetails;
 import com.seeyouletter.domain_member.entity.OauthUser;
 import com.seeyouletter.domain_member.enums.OauthType;
 import com.seeyouletter.domain_member.repository.OauthUserRepository;
@@ -29,7 +30,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
     private final OauthUserRepository oauthUserRepository;
 
-    private static final String CANNOT_FIND_PROVIDER = "connot find provider";
+    private static final String CANNOT_FIND_PROVIDER = "cannot find provider";
 
 
     private final ObjectMapper objectMapper = new Jackson2ObjectMapperBuilder()
@@ -46,20 +47,21 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
                 .getRegistrationId();
 
         OauthAttributes oauthAttributes = mapToAttributes(provider, oAuth2User.getAttributes());
-        isNewInsert(oauthAttributes.convertOauthUser());
+        OauthUser oauthUser = isNewInsert(oauthAttributes.convertOauthUser());
 
-        return oAuth2User;
+        return new PrincipalDetails(oauthUser.getUser(), oAuth2User.getAttributes());
     }
 
-    public void isNewInsert(OauthUser oauthUser) {
+    public OauthUser isNewInsert(OauthUser oauthUser) {
         Optional<OauthUser> optionalOauthUser = oauthUserRepository.findByOauthId(oauthUser.getOauthId());
 
         if (optionalOauthUser.isPresent()) {
-            return;
+            return optionalOauthUser.get();
         }
 
         userRepository.save(oauthUser.getUser());
         oauthUserRepository.save(oauthUser);
+        return oauthUser;
     }
 
     private OauthAttributes mapToAttributes(String provider, Map<String, Object> attributes){
