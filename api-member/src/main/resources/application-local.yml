@@ -28,7 +28,7 @@ spring:
             clientSecret: ENC(FSm1doVFr2RG97uyspaJpI9/qkAl21mz)
             clientAuthenticationMethod: post
             authorizationGrantType: authorization_code
-            redirectUri: http://localhost:8600/login/oauth2/code/naver
+            redirectUri: http://localhost:${server.port}/login/oauth2/code/naver
             scope:
               - nickname
               - email
@@ -43,7 +43,7 @@ spring:
             clientSecret: ENC(rNGXN3onQN+TLtHB+a8HTD6l6aF5Jj0m3UNdOjwqoGFeJ3O/OygGA3gg+smPZKR7)
             clientAuthenticationMethod: post
             authorizationGrantType: authorization_code
-            redirectUri: http://localhost:8600/login/oauth2/code/kakao
+            redirectUri: http://localhost:${server.port}/login/oauth2/code/kakao
             scope:
               - profile_nickname
               - account_email
