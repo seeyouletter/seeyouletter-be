@@ -14,11 +14,12 @@ public class PrincipalDetails implements UserDetails, OAuth2User {
 
     private final User user;
 
-    private Map<String, Object> attributes;
+    private final Map<String, Object> attributes;
 
 
     public PrincipalDetails(User user){
         this.user = user;
+        this.attributes = null;
     }
 
     public PrincipalDetails(User user, Map<String, Object> attributes){
