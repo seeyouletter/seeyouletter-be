@@ -2,6 +2,9 @@ server:
   port: 8600
 
 spring:
+  sql:
+    init:
+      mode: always
   datasource:
     url: jdbc:postgresql://localhost:5432/seeyouletter?serverTimezone=UTC&useSSL=false&allowPublicKeyRetrieval=true
     username: app
@@ -16,6 +19,7 @@ spring:
         default_batch_fetch_size: 1000
         format_sql: true
     open-in-view: false
+    defer-datasource-initialization: true
   security:
     oauth2:
       resourceserver:
