@@ -32,6 +32,8 @@ NOTE: 2023-01-25 작성일 기준으로 `public-client` 인 SPA에서만 서비�
 | address | 주소(OIDC scope)
 |===
 
+`OIDC` scope에 대해서는 link:https://openid.net/specs/openid-connect-core-1_0.html#UserInfoResponse[해당 문서]를 참고해주세요.
+
 === HTTP request
 include::{snippets}/authorization/http-request.adoc[]
 
@@ -116,7 +118,9 @@ include::{snippets}/revoke/http-response.adoc[]
 
 인증 서버에서 토큰을 발급한 유저의 정보를 조회합니다.
 
-NOTE: 유저 정보에 대한 명세를 구체화함에 따라 응답 필드는 지속적으로 추가될 예정입니다.
+`OIDC` standard claims에 대해서는 link:https://openid.net/specs/openid-connect-core-1_0.html#StandardClaims[해당 문서]를 참고해주세요.
+
+NOTE: 유저 정보에 대한 명세를 구체화함에 따라 응답 필드는 지속적으로 추가될 수 있습니다.
 
 === HTTP request
 include::{snippets}/userinfo/http-request.adoc[]
