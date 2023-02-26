@@ -1,5 +1,7 @@
 package com.seeyouletter.api_member.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -10,20 +12,30 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import static com.seeyouletter.api_member.auth.config.CustomHttpConfigurer.customHttpConfigurer;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 
 @EnableWebSecurity
+@RequiredArgsConstructor
 public class SecurityConfiguration {
+
+    private final ObjectMapper objectMapper;
 
     @Bean
     public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity
                 .oauth2Login();
 
-        return httpSecurity
+        httpSecurity
+                .apply(customHttpConfigurer(objectMapper));
+
+        httpSecurity
                 .cors()
                 .configurationSource(corsConfigurationSource())
+                .and()
+                .csrf()
+                .ignoringAntMatchers("/login")
                 .and()
                 .authorizeRequests()
                 .mvcMatchers("/authorized").permitAll()
@@ -31,10 +43,11 @@ public class SecurityConfiguration {
                 .authenticated()
                 .and()
                 .formLogin()
+                .loginProcessingUrl("/form/login")
                 .defaultSuccessUrl("/")
-                .usernameParameter("email")
-                .and()
-                .build();
+                .usernameParameter("email");
+
+        return httpSecurity.build();
     }
 
     @Bean
