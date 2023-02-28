@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.seeyouletter.api_member.auth.config.RestAuthenticationProcessingFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -17,6 +18,7 @@ import static com.seeyouletter.api_member.auth.config.CustomHttpConfigurer.custo
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 
+@Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfiguration {
@@ -36,10 +38,10 @@ public class SecurityConfiguration {
                 .configurationSource(corsConfigurationSource())
                 .and()
                 .csrf()
-                .ignoringAntMatchers(RestAuthenticationProcessingFilter.REST_LOGIN_PATTERN)
+                .ignoringRequestMatchers(RestAuthenticationProcessingFilter.REST_LOGIN_PATTERN)
                 .and()
-                .authorizeRequests()
-                .mvcMatchers("/authorized").permitAll()
+                .authorizeHttpRequests()
+                .requestMatchers("/authorized").permitAll()
                 .anyRequest()
                 .authenticated()
                 .and()

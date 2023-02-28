@@ -1,12 +1,14 @@
 package com.seeyouletter.api_member.config;
 
 import org.springframework.context.annotation.Bean;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfigurationSource;
 
-@EnableGlobalMethodSecurity(prePostEnabled = true)
+@Configuration
+@EnableMethodSecurity
 public class ResourceServiceConfiguration {
 
     @Bean
@@ -16,8 +18,8 @@ public class ResourceServiceConfiguration {
                 .cors()
                 .configurationSource(corsConfigurationSource)
                 .and()
-                .requestMatchers()
-                .mvcMatchers("/api/**")
+                .securityMatchers()
+                .requestMatchers("/api/**")
                 .and()
                 .oauth2ResourceServer()
                 .jwt();

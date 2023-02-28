@@ -66,6 +66,7 @@ class RedisOauth2AuthorizationServiceTest extends IntegrationTestContext {
         stringRedisTemplate
                 .getConnectionFactory()
                 .getConnection()
+                .serverCommands()
                 .flushAll();
     }
 

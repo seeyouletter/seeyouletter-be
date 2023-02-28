@@ -44,8 +44,7 @@ import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuild
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
-import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
-import static org.springframework.restdocs.request.RequestDocumentation.requestParameters;
+import static org.springframework.restdocs.request.RequestDocumentation.*;
 import static org.springframework.security.oauth2.core.AuthorizationGrantType.AUTHORIZATION_CODE;
 import static org.springframework.security.oauth2.core.ClientAuthenticationMethod.NONE;
 import static org.springframework.security.oauth2.core.oidc.OidcScopes.*;
@@ -76,6 +75,7 @@ class Oauth2AuthorizationTest extends IntegrationTestContext {
         stringRedisTemplate
                 .getConnectionFactory()
                 .getConnection()
+                .serverCommands()
                 .flushAll();
     }
 
@@ -99,7 +99,7 @@ class Oauth2AuthorizationTest extends IntegrationTestContext {
                                 "authorization",
                                 REQUEST_PREPROCESSOR,
                                 RESPONSE_PREPROCESSOR,
-                                requestParameters(
+                                queryParameters(
                                         parameterWithName("client_id").description("클라이언트 id"),
                                         parameterWithName("redirect_uri").description("리다이렉트 callback uri"),
                                         parameterWithName("scope").description("토큰의 인가 범위").optional(),
@@ -151,7 +151,7 @@ class Oauth2AuthorizationTest extends IntegrationTestContext {
                                 requestHeaders(
                                         headerWithName(CONTENT_TYPE).description(CONTENT_TYPE)
                                 ),
-                                requestParameters(
+                                formParameters(
                                         parameterWithName("client_id").description("클라이언트 id"),
                                         parameterWithName("code").description("인가 코드"),
                                         parameterWithName("code_verifier").description("해시 원본 값"),
@@ -226,7 +226,7 @@ class Oauth2AuthorizationTest extends IntegrationTestContext {
                                 requestHeaders(
                                         headerWithName(CONTENT_TYPE).description(CONTENT_TYPE)
                                 ),
-                                requestParameters(
+                                formParameters(
                                         parameterWithName("client_id").description("클라이언트 id"),
                                         parameterWithName("code").description("인가 코드"),
                                         parameterWithName("code_verifier").description("해시 원본 값"),
@@ -301,7 +301,7 @@ class Oauth2AuthorizationTest extends IntegrationTestContext {
                                 requestHeaders(
                                         headerWithName(CONTENT_TYPE).description(CONTENT_TYPE)
                                 ),
-                                requestParameters(
+                                formParameters(
                                         parameterWithName("client_id").description("클라이언트 id"),
                                         parameterWithName("code").description("인가 코드"),
                                         parameterWithName("code_verifier").description("해시 원본 값"),

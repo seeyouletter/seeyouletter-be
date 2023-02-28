@@ -2,13 +2,19 @@ package com.seeyouletter.domain_member.entity;
 
 import com.seeyouletter.domain_member.enums.OauthType;
 import com.seeyouletter.domain_member.enums.converter.OauthTypeConverter;
-import com.sun.istack.NotNull;
+import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import javax.persistence.*;
 
 @Getter
 @Entity
@@ -23,13 +29,12 @@ public class OauthUser {
     @Column(unique = true)
     private String oauthId;
 
-    @NotNull
     @Column(nullable = false)
     @Convert(converter = OauthTypeConverter.class)
     private OauthType provider;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="user_id")
+    @JoinColumn(name = "user_id")
     private User user;
 
 }

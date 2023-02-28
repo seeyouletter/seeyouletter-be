@@ -17,8 +17,9 @@ spring:
         default_batch_fetch_size: 1000
         format_sql: true
     open-in-view: false
-  redis:
-    host: ENC(c9oB4rht7QricGx0PBvgEhaEqd829uenF5X24wqHBRvQtuWEiT1NYpWHB7K6sqLtgj/XdO9Rzz49OsDhhQ3PIc9KzR3h6ieIsXCEA54BGrz+lcVtpy558A==)
+  data:
+    redis:
+      host: ENC(c9oB4rht7QricGx0PBvgEhaEqd829uenF5X24wqHBRvQtuWEiT1NYpWHB7K6sqLtgj/XdO9Rzz49OsDhhQ3PIc9KzR3h6ieIsXCEA54BGrz+lcVtpy558A==)
   security:
     oauth2:
       resourceserver:

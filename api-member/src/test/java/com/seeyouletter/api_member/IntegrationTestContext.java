@@ -63,35 +63,32 @@ public abstract class IntegrationTestContext {
 
     private static OperationRequestPreprocessor createRequestPreprocessor() {
         return preprocessRequest(
-                removeHeaders(
-                        "X-Forwarded-Host",
-                        "X-Forwarded-Proto",
-                        CONTENT_LENGTH
-                ),
-                modifyParameters()
-                        .remove("_csrf"),
-                prettyPrint()
+                prettyPrint(),
+                modifyHeaders()
+                        .remove("X-Forwarded-Host")
+                        .remove("X-Forwarded-Proto")
+                        .remove(CONTENT_LENGTH)
         );
     }
 
     private static OperationResponsePreprocessor createResponsePreprocessor() {
         return preprocessResponse(
                 prettyPrint(),
-                removeHeaders(
-                        "X-Content-Type-Options",
-                        "X-XSS-Protection",
-                        "X-Frame-Options",
-                        "Pragma",
-                        CACHE_CONTROL,
-                        EXPIRES,
-                        CONTENT_LENGTH
-                )
+                modifyHeaders()
+                        .remove("X-Content-Type-Options")
+                        .remove("X-XSS-Protection")
+                        .remove("X-Frame-Options")
+                        .remove("Pragma")
+                        .remove(VARY)
+                        .remove(CACHE_CONTROL)
+                        .remove(EXPIRES)
+                        .remove(CONTENT_LENGTH)
         );
     }
 
     @DynamicPropertySource
     static void registerDynamicProperty(DynamicPropertyRegistry registry) {
-        registry.add("spring.redis.port", () -> REDIS_CONTAINER.getFirstMappedPort() + "");
+        registry.add("spring.data.redis.port", () -> REDIS_CONTAINER.getFirstMappedPort() + "");
     }
 
 }

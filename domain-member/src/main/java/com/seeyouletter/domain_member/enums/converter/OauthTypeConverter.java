@@ -1,11 +1,10 @@
 package com.seeyouletter.domain_member.enums.converter;
 
 import com.seeyouletter.domain_member.enums.OauthType;
-import lombok.extern.slf4j.Slf4j;
-
-import javax.persistence.AttributeConverter;
-import javax.persistence.Converter;
+import jakarta.persistence.AttributeConverter;
+import jakarta.persistence.Converter;
 import java.util.Objects;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Converter

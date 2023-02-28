@@ -2,10 +2,9 @@ package com.seeyouletter.domain_member.entity;
 
 import com.seeyouletter.domain_member.enums.GenderType;
 import com.seeyouletter.domain_member.enums.converter.GenderTypeConverter;
-import com.sun.istack.NotNull;
+import jakarta.persistence.*;
 import lombok.*;
 
-import javax.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -21,11 +20,9 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotNull
     @Column(length = 50, nullable = false)
     private String name;
 
-    @NotNull
     @Column(length = 50, nullable = false)
     private String email;
 
@@ -37,7 +34,6 @@ public class User {
     @Column(length = 15)
     private String phone;
 
-    @NotNull
     @Column(nullable = false)
     @Convert(converter = GenderTypeConverter.class)
     private GenderType genderType;
