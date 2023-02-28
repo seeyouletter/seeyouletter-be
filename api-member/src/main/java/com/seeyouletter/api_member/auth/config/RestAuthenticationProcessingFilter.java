@@ -11,6 +11,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.util.MimeTypeUtils;
 
 import javax.servlet.FilterChain;
@@ -24,8 +25,8 @@ import java.io.IOException;
 @Slf4j
 public class RestAuthenticationProcessingFilter extends AbstractAuthenticationProcessingFilter {
 
-    private static final AntPathRequestMatcher DEFAULT_ANT_PATH_REQUEST_MATCHER = new AntPathRequestMatcher("/login",
-            "POST");
+    public static final String REST_LOGIN_PATTERN = "/login";
+    private static final RequestMatcher DEFAULT_ANT_PATH_REQUEST_MATCHER = new AntPathRequestMatcher(REST_LOGIN_PATTERN, "POST");
 
     private final ObjectMapper objectMapper;
 

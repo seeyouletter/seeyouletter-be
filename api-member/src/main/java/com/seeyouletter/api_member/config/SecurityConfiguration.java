@@ -1,6 +1,7 @@
 package com.seeyouletter.api_member.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.seeyouletter.api_member.auth.config.RestAuthenticationProcessingFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -35,7 +36,7 @@ public class SecurityConfiguration {
                 .configurationSource(corsConfigurationSource())
                 .and()
                 .csrf()
-                .ignoringAntMatchers("/login")
+                .ignoringAntMatchers(RestAuthenticationProcessingFilter.REST_LOGIN_PATTERN)
                 .and()
                 .authorizeRequests()
                 .mvcMatchers("/authorized").permitAll()
