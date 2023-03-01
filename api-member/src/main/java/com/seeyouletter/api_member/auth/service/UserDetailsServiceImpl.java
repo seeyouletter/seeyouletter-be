@@ -1,9 +1,9 @@
 package com.seeyouletter.api_member.auth.service;
 
-import com.seeyouletter.api_member.auth.config.PrincipalDetails;
 import com.seeyouletter.domain_member.entity.User;
 import com.seeyouletter.domain_member.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -21,7 +21,12 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException(email));
 
-        return new PrincipalDetails(user);
+        return org.springframework.security.core.userdetails.User.builder()
+                .username(user.getEmail())
+                .password(user.getPassword())
+                .authorities(AuthorityUtils.NO_AUTHORITIES)
+                .build();
+
     }
 
 }
