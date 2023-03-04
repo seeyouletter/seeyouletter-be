@@ -10,17 +10,16 @@ public class CustomHttpConfigurer extends AbstractHttpConfigurer<CustomHttpConfi
 
     private final ObjectMapper objectMapper;
 
-    private CustomHttpConfigurer(ObjectMapper objectMapper) {
+    public CustomHttpConfigurer(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
     }
 
     @Override
     public void configure(HttpSecurity http) throws Exception {
         AuthenticationManager authenticationManager = http.getSharedObject(AuthenticationManager.class);
-        http.addFilterBefore(new RestAuthenticationProcessingFilter(authenticationManager, objectMapper), UsernamePasswordAuthenticationFilter.class);
-    }
-
-    public static CustomHttpConfigurer customHttpConfigurer(ObjectMapper objectMapper) {
-        return new CustomHttpConfigurer(objectMapper);
+        RestAuthenticationProcessingFilter newFilter = new RestAuthenticationProcessingFilter(authenticationManager, objectMapper);
+        newFilter.setAuthenticationSuccessHandler(new RestLoginSuccessHandler());
+        newFilter.setAuthenticationFailureHandler(new RestLoginFailureHandler());
+        http.addFilterBefore(newFilter, UsernamePasswordAuthenticationFilter.class);
     }
 }
