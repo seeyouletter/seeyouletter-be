@@ -47,7 +47,7 @@ import static org.springframework.security.oauth2.server.authorization.client.Re
 @DisplayName(value = "RedisOauth2AuthorizationService 테스트")
 class RedisOauth2AuthorizationServiceTest extends IntegrationTestContext {
 
-    private static RegisteredClient publicClient;
+    private static final RegisteredClient publicClient = createOauth2PublicClient();
 
     @Autowired
     private OAuth2AuthorizationService oAuth2AuthorizationService;
@@ -56,13 +56,12 @@ class RedisOauth2AuthorizationServiceTest extends IntegrationTestContext {
     private StringRedisTemplate stringRedisTemplate;
 
     @BeforeAll
-    static void setUp(@Autowired RegisteredClientRepository registeredClientRepository) {
-        publicClient = createOauth2PublicClient();
+    static void beforeAll(@Autowired RegisteredClientRepository registeredClientRepository) {
         registeredClientRepository.save(publicClient);
     }
 
     @BeforeEach
-    void cleanUp() {
+    void beforeEach() {
         stringRedisTemplate
                 .getConnectionFactory()
                 .getConnection()

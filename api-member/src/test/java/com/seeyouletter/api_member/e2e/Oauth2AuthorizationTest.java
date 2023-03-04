@@ -3,6 +3,8 @@ package com.seeyouletter.api_member.e2e;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.seeyouletter.api_member.IntegrationTestContext;
 import com.seeyouletter.api_member.config.WithMockOauth2User;
+import com.seeyouletter.domain_member.entity.User;
+import com.seeyouletter.domain_member.repository.UserRepository;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URLEncodedUtils;
 import org.junit.jupiter.api.*;
@@ -23,11 +25,14 @@ import java.net.URISyntaxException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Base64;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static com.seeyouletter.domain_member.enums.GenderType.MALE;
 import static java.lang.String.join;
 import static java.nio.charset.StandardCharsets.US_ASCII;
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -55,7 +60,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @DisplayName(value = "Oauth2 인증 및 인가 테스트")
 class Oauth2AuthorizationTest extends IntegrationTestContext {
 
-    private static RegisteredClient publicClient;
+    private static final RegisteredClient publicClient = createOauth2PublicClient();
+
+    private static final String testUsername = "test@seeyouletter.kr";
 
     @Autowired
     private JwtDecoder jwtDecoder;
@@ -64,13 +71,19 @@ class Oauth2AuthorizationTest extends IntegrationTestContext {
     private StringRedisTemplate stringRedisTemplate;
 
     @BeforeAll
-    static void setUp(@Autowired RegisteredClientRepository registeredClientRepository) {
-        publicClient = createOauth2PublicClient();
+    static void beforeAll(@Autowired RegisteredClientRepository registeredClientRepository,
+                          @Autowired UserRepository userRepository) {
         registeredClientRepository.save(publicClient);
+        userRepository.save(createUser());
+    }
+
+    @AfterAll
+    static void afterAll(@Autowired UserRepository userRepository) {
+        userRepository.deleteAll();
     }
 
     @BeforeEach
-    void cleanUp() {
+    void beforeEach() {
         stringRedisTemplate
                 .getConnectionFactory()
                 .getConnection()
@@ -78,7 +91,7 @@ class Oauth2AuthorizationTest extends IntegrationTestContext {
     }
 
     @Nested
-    @WithMockUser
+    @WithMockUser(username = testUsername)
     @DisplayName(value = "first party 유저 세션의 Oauth2 인증 및 인가")
     class FirstPartyUserSessionOauth2Authorization {
 
@@ -357,7 +370,17 @@ class Oauth2AuthorizationTest extends IntegrationTestContext {
                                             headerWithName(CONTENT_TYPE).description(CONTENT_TYPE)
                                     ),
                                     responseFields(
-                                            fieldWithPath("sub").description("인가 요청자")
+                                            fieldWithPath("sub").description("인가 요청자"),
+                                            fieldWithPath("preferred_username").description("사용되는 이름"),
+                                            fieldWithPath("name").description("이름"),
+                                            fieldWithPath("nickname").description("닉네임"),
+                                            fieldWithPath("profile").description("프로필"),
+                                            fieldWithPath("birthdate").description("생년월일").optional(),
+                                            fieldWithPath("gender").description("성별"),
+                                            fieldWithPath("email").description("이메일"),
+                                            fieldWithPath("email_verified").description("이메일 검증 여부"),
+                                            fieldWithPath("phone_number").description("휴대전화번호").optional(),
+                                            fieldWithPath("phone_number_verified").description("휴대전화번호 검증 여부")
                                     )
                             )
                     );
@@ -366,7 +389,7 @@ class Oauth2AuthorizationTest extends IntegrationTestContext {
     }
 
     @Nested
-    @WithMockOauth2User
+    @WithMockOauth2User(username = testUsername)
     @DisplayName(value = "third party 유저 세션의 Oauth2 인증 및 인가")
     class ThirdPartyUserSessionOauth2Authorization {
 
@@ -559,6 +582,21 @@ class Oauth2AuthorizationTest extends IntegrationTestContext {
                                 .requireAuthorizationConsent(false)
                                 .build()
                 )
+                .build();
+    }
+
+    static User createUser() {
+        return User
+                .builder()
+                .email(testUsername)
+                .password("{noop}test1234")
+                .name("테스트")
+                .birth(LocalDate.now())
+                .genderType(MALE)
+                .howJoin("테스트를 위한 계정입니다.")
+                .lastAccess(LocalDateTime.now())
+                .phone("01031157613")
+                .regDate(LocalDateTime.now())
                 .build();
     }
 
