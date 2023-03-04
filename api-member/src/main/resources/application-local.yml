@@ -2,6 +2,9 @@ server:
   port: 8600
 
 spring:
+  sql:
+    init:
+      mode: always
   datasource:
     url: jdbc:postgresql://localhost:5432/seeyouletter?serverTimezone=UTC&useSSL=false&allowPublicKeyRetrieval=true
     username: app
@@ -16,6 +19,7 @@ spring:
         default_batch_fetch_size: 1000
         format_sql: true
     open-in-view: false
+    defer-datasource-initialization: true
   security:
     oauth2:
       resourceserver:
@@ -28,7 +32,7 @@ spring:
             clientSecret: ENC(FSm1doVFr2RG97uyspaJpI9/qkAl21mz)
             clientAuthenticationMethod: post
             authorizationGrantType: authorization_code
-            redirectUri: http://localhost:8600/login/oauth2/code/naver
+            redirectUri: http://localhost:${server.port}/login/oauth2/code/naver
             scope:
               - nickname
               - email
@@ -43,7 +47,7 @@ spring:
             clientSecret: ENC(rNGXN3onQN+TLtHB+a8HTD6l6aF5Jj0m3UNdOjwqoGFeJ3O/OygGA3gg+smPZKR7)
             clientAuthenticationMethod: post
             authorizationGrantType: authorization_code
-            redirectUri: http://localhost:8600/login/oauth2/code/kakao
+            redirectUri: http://localhost:${server.port}/login/oauth2/code/kakao
             scope:
               - profile_nickname
               - account_email
@@ -78,6 +82,10 @@ logging:
   level:
     org:
       springframework:
+        jdbc:
+          datasource:
+            init:
+              ScriptUtils: DEBUG
         security: DEBUG
         security.jackson2: INFO
       hibernate:

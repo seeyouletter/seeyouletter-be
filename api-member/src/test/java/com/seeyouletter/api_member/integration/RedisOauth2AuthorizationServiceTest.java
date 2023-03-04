@@ -33,9 +33,7 @@ import static java.security.MessageDigest.getInstance;
 import static java.time.Instant.now;
 import static java.util.Collections.singletonMap;
 import static java.util.UUID.randomUUID;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.notNullValue;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.oauth2.core.AuthorizationGrantType.AUTHORIZATION_CODE;
 import static org.springframework.security.oauth2.core.ClientAuthenticationMethod.NONE;
 import static org.springframework.security.oauth2.core.OAuth2AccessToken.TokenType.BEARER;
@@ -49,7 +47,7 @@ import static org.springframework.security.oauth2.server.authorization.client.Re
 @DisplayName(value = "RedisOauth2AuthorizationService 테스트")
 class RedisOauth2AuthorizationServiceTest extends IntegrationTestContext {
 
-    private static RegisteredClient publicClient;
+    private static final RegisteredClient publicClient = createOauth2PublicClient();
 
     @Autowired
     private OAuth2AuthorizationService oAuth2AuthorizationService;
@@ -58,13 +56,12 @@ class RedisOauth2AuthorizationServiceTest extends IntegrationTestContext {
     private StringRedisTemplate stringRedisTemplate;
 
     @BeforeAll
-    static void setUp(@Autowired RegisteredClientRepository registeredClientRepository) {
-        publicClient = createOauth2PublicClient();
+    static void beforeAll(@Autowired RegisteredClientRepository registeredClientRepository) {
         registeredClientRepository.save(publicClient);
     }
 
     @BeforeEach
-    void cleanUp() {
+    void beforeEach() {
         stringRedisTemplate
                 .getConnectionFactory()
                 .getConnection()
@@ -85,14 +82,8 @@ class RedisOauth2AuthorizationServiceTest extends IntegrationTestContext {
             oAuth2AuthorizationService.save(authorization);
 
             // then
-            assertThat(
-                    stringRedisTemplate.hasKey(AUTHORIZATION_CONSENT_STATE_KEY_PREFIX + authorization.getAttribute(STATE)),
-                    is(true)
-            );
-            assertThat(
-                    stringRedisTemplate.hasKey(AUTHORIZATION_KEY_PREFIX + authorization.getId()),
-                    is(true)
-            );
+            assertThat(stringRedisTemplate.hasKey(AUTHORIZATION_CONSENT_STATE_KEY_PREFIX + authorization.getAttribute(STATE))).isTrue();
+            assertThat(stringRedisTemplate.hasKey(AUTHORIZATION_KEY_PREFIX + authorization.getId())).isTrue();
         }
 
         @Test
@@ -110,14 +101,8 @@ class RedisOauth2AuthorizationServiceTest extends IntegrationTestContext {
                     .getTokenValue();
 
             // then
-            assertThat(
-                    stringRedisTemplate.hasKey(AUTHORIZATION_CODE_KEY_PREFIX + authorizationCodeValue),
-                    is(true)
-            );
-            assertThat(
-                    stringRedisTemplate.hasKey(AUTHORIZATION_KEY_PREFIX + authorization.getId()),
-                    is(true)
-            );
+            assertThat(stringRedisTemplate.hasKey(AUTHORIZATION_CODE_KEY_PREFIX + authorizationCodeValue)).isTrue();
+            assertThat(stringRedisTemplate.hasKey(AUTHORIZATION_KEY_PREFIX + authorization.getId())).isTrue();
         }
 
         @Test
@@ -145,22 +130,10 @@ class RedisOauth2AuthorizationServiceTest extends IntegrationTestContext {
                     .getTokenValue();
 
             // then
-            assertThat(
-                    stringRedisTemplate.hasKey(AUTHORIZATION_CODE_KEY_PREFIX + authorizationCodeValue),
-                    is(true)
-            );
-            assertThat(
-                    stringRedisTemplate.hasKey(AUTHORIZATION_ACCESS_TOKEN_KEY_PREFIX + encrypt(accessTokenValue)),
-                    is(true)
-            );
-            assertThat(
-                    stringRedisTemplate.hasKey(AUTHORIZATION_REFRESH_TOKEN_KEY_PREFIX + encrypt(refreshTokenValue)),
-                    is(true)
-            );
-            assertThat(
-                    stringRedisTemplate.hasKey(AUTHORIZATION_KEY_PREFIX + authorization.getId()),
-                    is(true)
-            );
+            assertThat(stringRedisTemplate.hasKey(AUTHORIZATION_CODE_KEY_PREFIX + authorizationCodeValue)).isTrue();
+            assertThat(stringRedisTemplate.hasKey(AUTHORIZATION_ACCESS_TOKEN_KEY_PREFIX + encrypt(accessTokenValue))).isTrue();
+            assertThat(stringRedisTemplate.hasKey(AUTHORIZATION_REFRESH_TOKEN_KEY_PREFIX + encrypt(refreshTokenValue))).isTrue();
+            assertThat(stringRedisTemplate.hasKey(AUTHORIZATION_KEY_PREFIX + authorization.getId())).isTrue();
         }
 
     }
@@ -181,12 +154,9 @@ class RedisOauth2AuthorizationServiceTest extends IntegrationTestContext {
         authorizations.forEach(oAuth2AuthorizationService::remove);
 
         // then
-        authorizations.forEach(authorization ->
-                assertThat(
-                        stringRedisTemplate.hasKey(AUTHORIZATION_KEY_PREFIX + authorization.getId()),
-                        is(false)
-                )
-        );
+        for (OAuth2Authorization authorization : authorizations) {
+            assertThat(stringRedisTemplate.hasKey(AUTHORIZATION_KEY_PREFIX + authorization.getId())).isFalse();
+        }
     }
 
     @Test
@@ -203,7 +173,7 @@ class RedisOauth2AuthorizationServiceTest extends IntegrationTestContext {
 
         // when & then
         for (OAuth2Authorization authorization : authorizations) {
-            assertThat(authorization, is(notNullValue()));
+            assertThat(authorization).isNotNull();
         }
     }
 
@@ -223,7 +193,7 @@ class RedisOauth2AuthorizationServiceTest extends IntegrationTestContext {
             OAuth2Authorization byToken = oAuth2AuthorizationService.findByToken(authorization.getAttribute(STATE), new OAuth2TokenType(STATE));
 
             // then
-            assertThat(byToken, is(notNullValue()));
+            assertThat(byToken).isNotNull();
         }
 
         @Test
@@ -243,7 +213,7 @@ class RedisOauth2AuthorizationServiceTest extends IntegrationTestContext {
             OAuth2Authorization byToken = oAuth2AuthorizationService.findByToken(authorizationCodeValue, new OAuth2TokenType(CODE));
 
             // then
-            assertThat(byToken, is(notNullValue()));
+            assertThat(byToken).isNotNull();
         }
 
         @Test
@@ -273,7 +243,7 @@ class RedisOauth2AuthorizationServiceTest extends IntegrationTestContext {
 
             // then
             for (OAuth2Authorization byToken : byTokens) {
-                assertThat(byToken, is(notNullValue()));
+                assertThat(byToken).isNotNull();
             }
         }
 

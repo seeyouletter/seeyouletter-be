@@ -10,7 +10,6 @@ import org.springframework.core.annotation.Order;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.oauth2.server.resource.OAuth2ResourceServerConfigurer;
-import org.springframework.security.oauth2.jwt.JwtClaimsSet;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.server.authorization.OAuth2AuthorizationService;
 import org.springframework.security.oauth2.server.authorization.client.InMemoryRegisteredClientRepository;
@@ -20,9 +19,8 @@ import org.springframework.security.oauth2.server.authorization.config.annotatio
 import org.springframework.security.oauth2.server.authorization.config.annotation.web.configurers.OAuth2AuthorizationServerConfigurer;
 import org.springframework.security.oauth2.server.authorization.settings.AuthorizationServerSettings;
 import org.springframework.security.oauth2.server.authorization.settings.ClientSettings;
-import org.springframework.security.oauth2.server.authorization.token.JwtEncodingContext;
-import org.springframework.security.oauth2.server.authorization.token.OAuth2TokenCustomizer;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.cors.CorsConfigurationSource;
 
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
@@ -37,8 +35,6 @@ import static org.springframework.security.config.Customizer.withDefaults;
 import static org.springframework.security.oauth2.core.AuthorizationGrantType.AUTHORIZATION_CODE;
 import static org.springframework.security.oauth2.core.ClientAuthenticationMethod.NONE;
 import static org.springframework.security.oauth2.core.oidc.OidcScopes.*;
-import static org.springframework.security.oauth2.core.oidc.endpoint.OidcParameterNames.ID_TOKEN;
-import static org.springframework.security.oauth2.server.authorization.OAuth2TokenType.ACCESS_TOKEN;
 import static org.springframework.security.oauth2.server.authorization.client.RegisteredClient.withId;
 import static org.springframework.security.oauth2.server.authorization.config.annotation.web.configuration.OAuth2AuthorizationServerConfiguration.applyDefaultSecurity;
 
@@ -47,10 +43,14 @@ public class AuthorizationServerConfiguration {
 
     @Bean
     @Order(value = HIGHEST_PRECEDENCE)
-    public SecurityFilterChain authorizationServerSecurityFilterChain(HttpSecurity httpSecurity) throws Exception {
+    public SecurityFilterChain authorizationServerSecurityFilterChain(HttpSecurity httpSecurity,
+                                                                      CorsConfigurationSource corsConfigurationSource) throws Exception {
         applyDefaultSecurity(httpSecurity);
 
         return httpSecurity
+                .cors()
+                .configurationSource(corsConfigurationSource)
+                .and()
                 .getConfigurer(OAuth2AuthorizationServerConfigurer.class)
                 .oidc(withDefaults())
                 .and()
@@ -63,16 +63,14 @@ public class AuthorizationServerConfiguration {
     public RegisteredClientRepository registeredClientRepository() {
         Set<String> allowedOidcScopes = Set.of(OPENID, PROFILE, EMAIL, ADDRESS, PHONE);
         Set<String> allowedCustomScopes = Set.of("user.read", "user.write");
+        Set<String> allowedRedirectUris = Set.of("http://127.0.0.1:8600/authorized", "https://dev-member.seeyouletter.kr/authorized");
+
 
         RegisteredClient registeredClient = withId("98348f89-5433-41a1-b12d-657f4f3d19f9")
                 .clientId("seeyouletter")
                 .clientAuthenticationMethod(NONE)
                 .authorizationGrantType(AUTHORIZATION_CODE)
-                .redirectUris(redirectUris -> {
-                    redirectUris.add("http://127.0.0.1:8600/authorized");
-                    redirectUris.add("http://127.0.0.1:2462/auth/redirect");
-                    redirectUris.add("https://seeyouletter.kr/auth/redirect");
-                })
+                .redirectUris(redirectUris -> redirectUris.addAll(allowedRedirectUris))
                 .scopes(scopes -> {
                     scopes.addAll(allowedOidcScopes);
                     scopes.addAll(allowedCustomScopes);
@@ -136,27 +134,6 @@ public class AuthorizationServerConfiguration {
         return AuthorizationServerSettings
                 .builder()
                 .build();
-    }
-
-    @Bean
-    public OAuth2TokenCustomizer<JwtEncodingContext> oAuth2TokenCustomizer() {
-        return context -> {
-            JwtClaimsSet.Builder claims = context.getClaims();
-
-            if (context.getTokenType().equals(ACCESS_TOKEN)) {
-                String name = context
-                        .getPrincipal()
-                        .getName();
-
-                claims.claim("sub", name);
-
-                return;
-            }
-
-            if (context.getTokenType().getValue().equals(ID_TOKEN)) {
-                // TODO Customize claims for id_token
-            }
-        };
     }
 
 }

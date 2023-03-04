@@ -31,7 +31,7 @@ public class User {
 
     private String profileImage;
 
-    @Column(length = 20)
+    @Column(length = 100)
     private String password;
 
     @Column(length = 15)

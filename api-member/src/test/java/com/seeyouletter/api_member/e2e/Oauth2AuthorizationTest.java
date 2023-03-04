@@ -2,12 +2,12 @@ package com.seeyouletter.api_member.e2e;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.seeyouletter.api_member.IntegrationTestContext;
+import com.seeyouletter.api_member.config.WithMockOauth2User;
+import com.seeyouletter.domain_member.entity.User;
+import com.seeyouletter.domain_member.repository.UserRepository;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URLEncodedUtils;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -25,21 +25,22 @@ import java.net.URISyntaxException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Base64;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static com.seeyouletter.domain_member.enums.GenderType.MALE;
 import static java.lang.String.join;
 import static java.nio.charset.StandardCharsets.US_ASCII;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.security.MessageDigest.getInstance;
 import static java.util.UUID.randomUUID;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.http.HttpHeaders.*;
 import static org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED;
-import static org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED_VALUE;
 import static org.springframework.restdocs.headers.HeaderDocumentation.*;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
@@ -59,7 +60,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @DisplayName(value = "Oauth2 인증 및 인가 테스트")
 class Oauth2AuthorizationTest extends IntegrationTestContext {
 
-    private static RegisteredClient publicClient;
+    private static final RegisteredClient publicClient = createOauth2PublicClient();
+
+    private static final String testUsername = "test@seeyouletter.kr";
 
     @Autowired
     private JwtDecoder jwtDecoder;
@@ -68,303 +71,495 @@ class Oauth2AuthorizationTest extends IntegrationTestContext {
     private StringRedisTemplate stringRedisTemplate;
 
     @BeforeAll
-    static void setUp(@Autowired RegisteredClientRepository registeredClientRepository) {
-        publicClient = createOauth2PublicClient();
+    static void beforeAll(@Autowired RegisteredClientRepository registeredClientRepository,
+                          @Autowired UserRepository userRepository) {
         registeredClientRepository.save(publicClient);
+        userRepository.save(createUser());
+    }
+
+    @AfterAll
+    static void afterAll(@Autowired UserRepository userRepository) {
+        userRepository.deleteAll();
     }
 
     @BeforeEach
-    void cleanUp() {
+    void beforeEach() {
         stringRedisTemplate
                 .getConnectionFactory()
                 .getConnection()
                 .flushAll();
     }
 
-    @Test
-    @WithMockUser
-    @DisplayName(value = "authorization")
-    void authorization() throws Exception {
-        // given
-        String clientId = publicClient.getClientId();
-        String redirectUri = publicClient.getRedirectUris().stream().findFirst().orElseThrow();
-        String scope = join(" ", publicClient.getScopes());
-        String codeVerifier = generateCodeVerifier();
-        String codeChallenge = generateCodeChallenge(codeVerifier);
-        String state = randomUUID().toString();
-        String nonce = randomUUID().toString();
+    @Nested
+    @WithMockUser(username = testUsername)
+    @DisplayName(value = "first party 유저 세션의 Oauth2 인증 및 인가")
+    class FirstPartyUserSessionOauth2Authorization {
 
-        // when & then
-        MvcResult authorizationResult = performAuthorizationRequest(clientId, redirectUri, scope, codeChallenge, state, nonce)
-                .andDo(
-                        document(
-                                "authorization",
-                                REQUEST_PREPROCESSOR,
-                                RESPONSE_PREPROCESSOR,
-                                requestParameters(
-                                        parameterWithName("client_id").description("클라이언트 id"),
-                                        parameterWithName("redirect_uri").description("리다이렉트 callback uri"),
-                                        parameterWithName("scope").description("토큰의 인가 범위").optional(),
-                                        parameterWithName("response_type").description("응답 유형, code 고정으로 사용"),
-                                        parameterWithName("code_challenge").description("해시 값, Base64(SHA256(code_verifier))"),
-                                        parameterWithName("code_challenge_method").description("해시 방식, S256 고정으로 사용"),
-                                        parameterWithName("state").description("리다이렉트 callback uri로 전달되는 값").optional(),
-                                        parameterWithName("nonce").description("id_token claim에 포함되는 값").optional()
-                                ),
-                                responseHeaders(
-                                        headerWithName(LOCATION).description(LOCATION)
-                                )
-                        )
-                )
-                .andReturn();
+        @Test
+        @DisplayName(value = "authorization")
+        void authorization() throws Exception {
+            // given
+            String clientId = publicClient.getClientId();
+            String redirectUri = publicClient.getRedirectUris().stream().findFirst().orElseThrow();
+            String scope = join(" ", publicClient.getScopes());
+            String codeVerifier = generateCodeVerifier();
+            String codeChallenge = generateCodeChallenge(codeVerifier);
+            String state = randomUUID().toString();
+            String nonce = randomUUID().toString();
 
-        Map<String, String> queryStrings = parseRedirectQueryString(authorizationResult);
+            // when & then
+            MvcResult authorizationResult = performAuthorizationRequest(clientId, redirectUri, scope, codeChallenge, state, nonce)
+                    .andDo(
+                            document(
+                                    "authorization",
+                                    REQUEST_PREPROCESSOR,
+                                    RESPONSE_PREPROCESSOR,
+                                    requestParameters(
+                                            parameterWithName("client_id").description("클라이언트 id"),
+                                            parameterWithName("redirect_uri").description("리다이렉트 callback uri"),
+                                            parameterWithName("scope").description("토큰의 인가 범위").optional(),
+                                            parameterWithName("response_type").description("응답 유형, code 고정으로 사용"),
+                                            parameterWithName("code_challenge").description("해시 값, Base64(SHA256(code_verifier))"),
+                                            parameterWithName("code_challenge_method").description("해시 방식, S256 고정으로 사용"),
+                                            parameterWithName("state").description("리다이렉트 callback uri로 전달되는 값").optional(),
+                                            parameterWithName("nonce").description("id_token claim에 포함되는 값").optional()
+                                    ),
+                                    responseHeaders(
+                                            headerWithName(LOCATION).description(LOCATION)
+                                    )
+                            )
+                    )
+                    .andReturn();
 
-        assertThat(queryStrings.get("state"), is(equalTo(state)));
-        assertThat(queryStrings.get("code"), is(not(emptyOrNullString())));
+            Map<String, String> queryStrings = parseRedirectQueryString(authorizationResult);
+
+            assertThat(queryStrings.get("state")).isEqualTo(state);
+            assertThat(queryStrings.get("code")).isNotEmpty();
+        }
+
+        @Test
+        @DisplayName(value = "token")
+        void token() throws Exception {
+            // given
+            String clientId = publicClient.getClientId();
+            String redirectUri = publicClient.getRedirectUris().stream().findFirst().orElseThrow();
+            String scope = join(" ", publicClient.getScopes());
+            String codeVerifier = generateCodeVerifier();
+            String codeChallenge = generateCodeChallenge(codeVerifier);
+            String state = randomUUID().toString();
+            String nonce = randomUUID().toString();
+
+            MvcResult authorizationResult = performAuthorizationRequest(clientId, redirectUri, scope, codeChallenge, state, nonce)
+                    .andReturn();
+
+            String code = parseRedirectQueryString(authorizationResult)
+                    .get("code");
+
+            // when & then
+            MvcResult tokenResult = performTokenRequest(clientId, redirectUri, codeVerifier, code)
+                    .andDo(
+                            document(
+                                    "token",
+                                    REQUEST_PREPROCESSOR,
+                                    RESPONSE_PREPROCESSOR,
+                                    requestHeaders(
+                                            headerWithName(CONTENT_TYPE).description(CONTENT_TYPE)
+                                    ),
+                                    requestParameters(
+                                            parameterWithName("client_id").description("클라이언트 id"),
+                                            parameterWithName("code").description("인가 코드"),
+                                            parameterWithName("code_verifier").description("해시 원본 값"),
+                                            parameterWithName("grant_type").description("인증 방식, authorization_code 고정으로 사용"),
+                                            parameterWithName("redirect_uri").description("리다이렉트 callback uri")
+                                    ),
+                                    responseHeaders(
+                                            headerWithName(CONTENT_TYPE).description(CONTENT_TYPE)
+                                    ),
+                                    responseFields(
+                                            fieldWithPath("access_token").description("엑세스 토큰"),
+                                            fieldWithPath("scope").description("엑세스 토큰의 인가 범위"),
+                                            fieldWithPath("id_token").description("인증 토큰, 인가 요청시 scope로 openid를 전달한 경우에만 발급").optional(),
+                                            fieldWithPath("token_type").description("토큰 타입, Bearer 고정으로 사용"),
+                                            fieldWithPath("expires_in").description("토큰의 남은 유효기간")
+                                    )
+                            )
+                    )
+                    .andReturn();
+
+            Map<String, Object> fields = parsePayloadFields(tokenResult);
+            Jwt idToken = jwtDecoder.decode((String) fields.get("id_token"));
+
+            assertThat(nonce).isEqualTo(idToken.getClaim("nonce"));
+        }
+
+        @Test
+        @DisplayName(value = "introspect")
+        void introspect() throws Exception {
+            // given
+            String clientId = publicClient.getClientId();
+            String redirectUri = publicClient.getRedirectUris().stream().findFirst().orElseThrow();
+            String scope = join(" ", publicClient.getScopes());
+            String codeVerifier = generateCodeVerifier();
+            String codeChallenge = generateCodeChallenge(codeVerifier);
+            String state = randomUUID().toString();
+            String nonce = randomUUID().toString();
+
+            MvcResult authorizationResult = performAuthorizationRequest(clientId, redirectUri, scope, codeChallenge, state, nonce)
+                    .andReturn();
+
+            String code = parseRedirectQueryString(authorizationResult)
+                    .get("code");
+
+            MvcResult tokenResult = performTokenRequest(clientId, redirectUri, codeVerifier, code)
+                    .andReturn();
+
+            String accessTokenValue = jwtDecoder
+                    .decode((String) parsePayloadFields(tokenResult).get("access_token"))
+                    .getTokenValue();
+
+            // when & then
+            mockMvc
+                    .perform(
+                            post("/oauth2/introspect")
+                                    .contentType(APPLICATION_FORM_URLENCODED)
+                                    .param("client_id", clientId)
+                                    .param("code", code)
+                                    .param("code_verifier", codeVerifier)
+                                    .param("grant_type", "authorization_code")
+                                    .param("redirect_uri", redirectUri)
+                                    .param("token", accessTokenValue)
+                    )
+                    .andExpect(status().isOk())
+                    .andDo(print())
+                    .andDo(
+                            document(
+                                    "introspect",
+                                    REQUEST_PREPROCESSOR,
+                                    RESPONSE_PREPROCESSOR,
+                                    requestHeaders(
+                                            headerWithName(CONTENT_TYPE).description(CONTENT_TYPE)
+                                    ),
+                                    requestParameters(
+                                            parameterWithName("client_id").description("클라이언트 id"),
+                                            parameterWithName("code").description("인가 코드"),
+                                            parameterWithName("code_verifier").description("해시 원본 값"),
+                                            parameterWithName("grant_type").description("인증 방식, authorization_code 고정으로 사용"),
+                                            parameterWithName("redirect_uri").description("리다이렉트 callback uri"),
+                                            parameterWithName("token").description("엑세스 토큰")
+                                    ),
+                                    responseHeaders(
+                                            headerWithName(CONTENT_TYPE).description(CONTENT_TYPE)
+                                    ),
+                                    responseFields(
+                                            fieldWithPath("active").description("엑세스 토큰의 유효 여부"),
+                                            fieldWithPath("sub").description("인가 요청자"),
+                                            fieldWithPath("aud").description("인가 클라이언트"),
+                                            fieldWithPath("nbf").description("엑세스 토큰이 활성화된 시간(unix time)"),
+                                            fieldWithPath("scope").description("엑세스 토큰의 인가 범위"),
+                                            fieldWithPath("iss").description("엑세스 토큰 발행자"),
+                                            fieldWithPath("exp").description("엑세스 토큰이 만료되는 시간(unix time)"),
+                                            fieldWithPath("iat").description("엑세스 토큰이 발행된 시간(unix time)"),
+                                            fieldWithPath("client_id").description("클라이언트 id"),
+                                            fieldWithPath("token_type").description("토큰 타입, Bearer 고정으로 사용")
+                                    )
+                            )
+                    );
+        }
+
+        @Test
+        @DisplayName(value = "revoke")
+        void revoke() throws Exception {
+            // given
+            String clientId = publicClient.getClientId();
+            String redirectUri = publicClient.getRedirectUris().stream().findFirst().orElseThrow();
+            String scope = join(" ", publicClient.getScopes());
+            String codeVerifier = generateCodeVerifier();
+            String codeChallenge = generateCodeChallenge(codeVerifier);
+            String state = randomUUID().toString();
+            String nonce = randomUUID().toString();
+
+            MvcResult authorizationResult = performAuthorizationRequest(clientId, redirectUri, scope, codeChallenge, state, nonce)
+                    .andReturn();
+
+            String code = parseRedirectQueryString(authorizationResult)
+                    .get("code");
+
+            MvcResult tokenResult = performTokenRequest(clientId, redirectUri, codeVerifier, code)
+                    .andReturn();
+
+            String accessTokenValue = jwtDecoder
+                    .decode((String) parsePayloadFields(tokenResult).get("access_token"))
+                    .getTokenValue();
+
+            // when & then
+            mockMvc
+                    .perform(
+                            post("/oauth2/revoke")
+                                    .contentType(APPLICATION_FORM_URLENCODED)
+                                    .param("client_id", clientId)
+                                    .param("code", code)
+                                    .param("code_verifier", codeVerifier)
+                                    .param("grant_type", "authorization_code")
+                                    .param("redirect_uri", redirectUri)
+                                    .param("token", accessTokenValue)
+                    )
+                    .andExpect(status().isOk())
+                    .andDo(print())
+                    .andDo(
+                            document(
+                                    "revoke",
+                                    REQUEST_PREPROCESSOR,
+                                    RESPONSE_PREPROCESSOR,
+                                    requestHeaders(
+                                            headerWithName(CONTENT_TYPE).description(CONTENT_TYPE)
+                                    ),
+                                    requestParameters(
+                                            parameterWithName("client_id").description("클라이언트 id"),
+                                            parameterWithName("code").description("인가 코드"),
+                                            parameterWithName("code_verifier").description("해시 원본 값"),
+                                            parameterWithName("grant_type").description("인증 방식, authorization_code 고정으로 사용"),
+                                            parameterWithName("redirect_uri").description("리다이렉트 callback uri"),
+                                            parameterWithName("token").description("엑세스 토큰")
+                                    )
+                            )
+                    );
+        }
+
+        @Test
+        @DisplayName(value = "userinfo")
+        void userinfo() throws Exception {
+            // given
+            String clientId = publicClient.getClientId();
+            String redirectUri = publicClient.getRedirectUris().stream().findFirst().orElseThrow();
+            String scope = join(" ", publicClient.getScopes());
+            String codeVerifier = generateCodeVerifier();
+            String codeChallenge = generateCodeChallenge(codeVerifier);
+            String state = randomUUID().toString();
+            String nonce = randomUUID().toString();
+
+            MvcResult authorizationResult = performAuthorizationRequest(clientId, redirectUri, scope, codeChallenge, state, nonce)
+                    .andReturn();
+
+            String code = parseRedirectQueryString(authorizationResult)
+                    .get("code");
+
+            MvcResult tokenResult = performTokenRequest(clientId, redirectUri, codeVerifier, code)
+                    .andReturn();
+
+            String accessTokenValue = jwtDecoder
+                    .decode((String) parsePayloadFields(tokenResult).get("access_token"))
+                    .getTokenValue();
+
+            // when & then
+            mockMvc
+                    .perform(
+                            get("/userinfo")
+                                    .header(AUTHORIZATION, "Bearer " + accessTokenValue)
+                    )
+                    .andExpect(status().isOk())
+                    .andDo(print())
+                    .andDo(
+                            document(
+                                    "userinfo",
+                                    REQUEST_PREPROCESSOR,
+                                    RESPONSE_PREPROCESSOR,
+                                    requestHeaders(
+                                            headerWithName(AUTHORIZATION).description("Bearer {access_token}")
+                                    ),
+                                    responseHeaders(
+                                            headerWithName(CONTENT_TYPE).description(CONTENT_TYPE)
+                                    ),
+                                    responseFields(
+                                            fieldWithPath("sub").description("인가 요청자"),
+                                            fieldWithPath("preferred_username").description("사용되는 이름"),
+                                            fieldWithPath("name").description("이름"),
+                                            fieldWithPath("nickname").description("닉네임"),
+                                            fieldWithPath("profile").description("프로필"),
+                                            fieldWithPath("birthdate").description("생년월일").optional(),
+                                            fieldWithPath("gender").description("성별"),
+                                            fieldWithPath("email").description("이메일"),
+                                            fieldWithPath("email_verified").description("이메일 검증 여부"),
+                                            fieldWithPath("phone_number").description("휴대전화번호").optional(),
+                                            fieldWithPath("phone_number_verified").description("휴대전화번호 검증 여부")
+                                    )
+                            )
+                    );
+        }
+
     }
 
-    @Test
-    @WithMockUser
-    @DisplayName(value = "token")
-    void token() throws Exception {
-        // given
-        String clientId = publicClient.getClientId();
-        String redirectUri = publicClient.getRedirectUris().stream().findFirst().orElseThrow();
-        String scope = join(" ", publicClient.getScopes());
-        String codeVerifier = generateCodeVerifier();
-        String codeChallenge = generateCodeChallenge(codeVerifier);
-        String state = randomUUID().toString();
-        String nonce = randomUUID().toString();
+    @Nested
+    @WithMockOauth2User(username = testUsername)
+    @DisplayName(value = "third party 유저 세션의 Oauth2 인증 및 인가")
+    class ThirdPartyUserSessionOauth2Authorization {
 
-        MvcResult authorizationResult = performAuthorizationRequest(clientId, redirectUri, scope, codeChallenge, state, nonce)
-                .andReturn();
+        @Test
+        @DisplayName(value = "authorization")
+        void authorization() throws Exception {
+            // given
+            String clientId = publicClient.getClientId();
+            String redirectUri = publicClient.getRedirectUris().stream().findFirst().orElseThrow();
+            String scope = join(" ", publicClient.getScopes());
+            String codeVerifier = generateCodeVerifier();
+            String codeChallenge = generateCodeChallenge(codeVerifier);
+            String state = randomUUID().toString();
+            String nonce = randomUUID().toString();
 
-        String code = parseRedirectQueryString(authorizationResult)
-                .get("code");
+            // when & then
+            MvcResult authorizationResult = performAuthorizationRequest(clientId, redirectUri, scope, codeChallenge, state, nonce)
+                    .andReturn();
 
-        // when & then
-        MvcResult tokenResult = performTokenRequest(clientId, redirectUri, codeVerifier, code)
-                .andDo(
-                        document(
-                                "token",
-                                REQUEST_PREPROCESSOR,
-                                RESPONSE_PREPROCESSOR,
-                                requestHeaders(
-                                        headerWithName(CONTENT_TYPE).description(CONTENT_TYPE)
-                                ),
-                                requestParameters(
-                                        parameterWithName("client_id").description("클라이언트 id"),
-                                        parameterWithName("code").description("인가 코드"),
-                                        parameterWithName("code_verifier").description("해시 원본 값"),
-                                        parameterWithName("grant_type").description("인증 방식, authorization_code 고정으로 사용"),
-                                        parameterWithName("redirect_uri").description("리다이렉트 callback uri")
-                                ),
-                                responseHeaders(
-                                        headerWithName(CONTENT_TYPE).description(CONTENT_TYPE)
-                                ),
-                                responseFields(
-                                        fieldWithPath("access_token").description("엑세스 토큰"),
-                                        fieldWithPath("scope").description("엑세스 토큰의 인가 범위"),
-                                        fieldWithPath("id_token").description("인증 토큰, 인가 요청시 scope로 openid를 전달한 경우에만 발급").optional(),
-                                        fieldWithPath("token_type").description("토큰 타입, Bearer 고정으로 사용"),
-                                        fieldWithPath("expires_in").description("토큰의 남은 유효기간")
-                                )
-                        )
-                )
-                .andReturn();
+            Map<String, String> queryStrings = parseRedirectQueryString(authorizationResult);
 
-        Map<String, Object> fields = parsePayloadFields(tokenResult);
-        Jwt idToken = jwtDecoder.decode((String) fields.get("id_token"));
+            assertThat(queryStrings.get("state")).isEqualTo(state);
+            assertThat(queryStrings.get("code")).isNotEmpty();
+        }
 
-        assertThat(nonce, is(equalTo(idToken.getClaim("nonce"))));
-    }
+        @Test
+        @DisplayName(value = "token")
+        void token() throws Exception {
+            // given
+            String clientId = publicClient.getClientId();
+            String redirectUri = publicClient.getRedirectUris().stream().findFirst().orElseThrow();
+            String scope = join(" ", publicClient.getScopes());
+            String codeVerifier = generateCodeVerifier();
+            String codeChallenge = generateCodeChallenge(codeVerifier);
+            String state = randomUUID().toString();
+            String nonce = randomUUID().toString();
 
-    @Test
-    @WithMockUser
-    @DisplayName(value = "introspect")
-    void introspect() throws Exception {
-        // given
-        String clientId = publicClient.getClientId();
-        String redirectUri = publicClient.getRedirectUris().stream().findFirst().orElseThrow();
-        String scope = join(" ", publicClient.getScopes());
-        String codeVerifier = generateCodeVerifier();
-        String codeChallenge = generateCodeChallenge(codeVerifier);
-        String state = randomUUID().toString();
-        String nonce = randomUUID().toString();
+            MvcResult authorizationResult = performAuthorizationRequest(clientId, redirectUri, scope, codeChallenge, state, nonce)
+                    .andReturn();
 
-        MvcResult authorizationResult = performAuthorizationRequest(clientId, redirectUri, scope, codeChallenge, state, nonce)
-                .andReturn();
+            String code = parseRedirectQueryString(authorizationResult)
+                    .get("code");
 
-        String code = parseRedirectQueryString(authorizationResult)
-                .get("code");
+            // when & then
+            MvcResult tokenResult = performTokenRequest(clientId, redirectUri, codeVerifier, code)
+                    .andReturn();
 
-        MvcResult tokenResult = performTokenRequest(clientId, redirectUri, codeVerifier, code)
-                .andReturn();
+            Map<String, Object> fields = parsePayloadFields(tokenResult);
+            Jwt idToken = jwtDecoder.decode((String) fields.get("id_token"));
 
-        String accessTokenValue = jwtDecoder
-                .decode((String) parsePayloadFields(tokenResult).get("access_token"))
-                .getTokenValue();
+            assertThat(nonce).isEqualTo(idToken.getClaim("nonce"));
+        }
 
-        // when & then
-        mockMvc
-                .perform(
-                        post("/oauth2/introspect")
-                                .contentType(APPLICATION_FORM_URLENCODED)
-                                .param("client_id", clientId)
-                                .param("code", code)
-                                .param("code_verifier", codeVerifier)
-                                .param("grant_type", "authorization_code")
-                                .param("redirect_uri", redirectUri)
-                                .param("token", accessTokenValue)
-                )
-                .andExpect(status().isOk())
-                .andDo(print())
-                .andDo(
-                        document(
-                                "introspect",
-                                REQUEST_PREPROCESSOR,
-                                RESPONSE_PREPROCESSOR,
-                                requestHeaders(
-                                        headerWithName(CONTENT_TYPE).description(CONTENT_TYPE)
-                                ),
-                                requestParameters(
-                                        parameterWithName("client_id").description("클라이언트 id"),
-                                        parameterWithName("code").description("인가 코드"),
-                                        parameterWithName("code_verifier").description("해시 원본 값"),
-                                        parameterWithName("grant_type").description("인증 방식, authorization_code 고정으로 사용"),
-                                        parameterWithName("redirect_uri").description("리다이렉트 callback uri"),
-                                        parameterWithName("token").description("엑세스 토큰")
-                                ),
-                                responseHeaders(
-                                        headerWithName(CONTENT_TYPE).description(CONTENT_TYPE)
-                                ),
-                                responseFields(
-                                        fieldWithPath("active").description("엑세스 토큰의 유효 여부"),
-                                        fieldWithPath("sub").description("인가 요청자"),
-                                        fieldWithPath("aud").description("인가 클라이언트"),
-                                        fieldWithPath("nbf").description("엑세스 토큰이 활성화된 시간(unix time)"),
-                                        fieldWithPath("scope").description("엑세스 토큰의 인가 범위"),
-                                        fieldWithPath("iss").description("엑세스 토큰 발행자"),
-                                        fieldWithPath("exp").description("엑세스 토큰이 만료되는 시간(unix time)"),
-                                        fieldWithPath("iat").description("엑세스 토큰이 발행된 시간(unix time)"),
-                                        fieldWithPath("client_id").description("클라이언트 id"),
-                                        fieldWithPath("token_type").description("토큰 타입, Bearer 고정으로 사용")
-                                )
-                        )
-                );
-    }
+        @Test
+        @DisplayName(value = "introspect")
+        void introspect() throws Exception {
+            // given
+            String clientId = publicClient.getClientId();
+            String redirectUri = publicClient.getRedirectUris().stream().findFirst().orElseThrow();
+            String scope = join(" ", publicClient.getScopes());
+            String codeVerifier = generateCodeVerifier();
+            String codeChallenge = generateCodeChallenge(codeVerifier);
+            String state = randomUUID().toString();
+            String nonce = randomUUID().toString();
 
-    @Test
-    @WithMockUser
-    @DisplayName(value = "revoke")
-    void revoke() throws Exception {
-        // given
-        String clientId = publicClient.getClientId();
-        String redirectUri = publicClient.getRedirectUris().stream().findFirst().orElseThrow();
-        String scope = join(" ", publicClient.getScopes());
-        String codeVerifier = generateCodeVerifier();
-        String codeChallenge = generateCodeChallenge(codeVerifier);
-        String state = randomUUID().toString();
-        String nonce = randomUUID().toString();
+            MvcResult authorizationResult = performAuthorizationRequest(clientId, redirectUri, scope, codeChallenge, state, nonce)
+                    .andReturn();
 
-        MvcResult authorizationResult = performAuthorizationRequest(clientId, redirectUri, scope, codeChallenge, state, nonce)
-                .andReturn();
+            String code = parseRedirectQueryString(authorizationResult)
+                    .get("code");
 
-        String code = parseRedirectQueryString(authorizationResult)
-                .get("code");
+            MvcResult tokenResult = performTokenRequest(clientId, redirectUri, codeVerifier, code)
+                    .andReturn();
 
-        MvcResult tokenResult = performTokenRequest(clientId, redirectUri, codeVerifier, code)
-                .andReturn();
+            String accessTokenValue = jwtDecoder
+                    .decode((String) parsePayloadFields(tokenResult).get("access_token"))
+                    .getTokenValue();
 
-        String accessTokenValue = jwtDecoder
-                .decode((String) parsePayloadFields(tokenResult).get("access_token"))
-                .getTokenValue();
+            // when & then
+            mockMvc
+                    .perform(
+                            post("/oauth2/introspect")
+                                    .contentType(APPLICATION_FORM_URLENCODED)
+                                    .param("client_id", clientId)
+                                    .param("code", code)
+                                    .param("code_verifier", codeVerifier)
+                                    .param("grant_type", "authorization_code")
+                                    .param("redirect_uri", redirectUri)
+                                    .param("token", accessTokenValue)
+                    )
+                    .andExpect(status().isOk())
+                    .andDo(print());
+        }
 
-        // when & then
-        mockMvc
-                .perform(
-                        post("/oauth2/revoke")
-                                .contentType(APPLICATION_FORM_URLENCODED)
-                                .param("client_id", clientId)
-                                .param("code", code)
-                                .param("code_verifier", codeVerifier)
-                                .param("grant_type", "authorization_code")
-                                .param("redirect_uri", redirectUri)
-                                .param("token", accessTokenValue)
-                )
-                .andExpect(status().isOk())
-                .andDo(print())
-                .andDo(
-                        document(
-                                "revoke",
-                                REQUEST_PREPROCESSOR,
-                                RESPONSE_PREPROCESSOR,
-                                requestHeaders(
-                                        headerWithName(CONTENT_TYPE).description(CONTENT_TYPE)
-                                ),
-                                requestParameters(
-                                        parameterWithName("client_id").description("클라이언트 id"),
-                                        parameterWithName("code").description("인가 코드"),
-                                        parameterWithName("code_verifier").description("해시 원본 값"),
-                                        parameterWithName("grant_type").description("인증 방식, authorization_code 고정으로 사용"),
-                                        parameterWithName("redirect_uri").description("리다이렉트 callback uri"),
-                                        parameterWithName("token").description("엑세스 토큰")
-                                )
-                        )
-                );
-    }
+        @Test
+        @DisplayName(value = "revoke")
+        void revoke() throws Exception {
+            // given
+            String clientId = publicClient.getClientId();
+            String redirectUri = publicClient.getRedirectUris().stream().findFirst().orElseThrow();
+            String scope = join(" ", publicClient.getScopes());
+            String codeVerifier = generateCodeVerifier();
+            String codeChallenge = generateCodeChallenge(codeVerifier);
+            String state = randomUUID().toString();
+            String nonce = randomUUID().toString();
 
-    @Test
-    @WithMockUser
-    @DisplayName(value = "userinfo")
-    void userinfo() throws Exception {
-        // given
-        String clientId = publicClient.getClientId();
-        String redirectUri = publicClient.getRedirectUris().stream().findFirst().orElseThrow();
-        String scope = join(" ", publicClient.getScopes());
-        String codeVerifier = generateCodeVerifier();
-        String codeChallenge = generateCodeChallenge(codeVerifier);
-        String state = randomUUID().toString();
-        String nonce = randomUUID().toString();
+            MvcResult authorizationResult = performAuthorizationRequest(clientId, redirectUri, scope, codeChallenge, state, nonce)
+                    .andReturn();
 
-        MvcResult authorizationResult = performAuthorizationRequest(clientId, redirectUri, scope, codeChallenge, state, nonce)
-                .andReturn();
+            String code = parseRedirectQueryString(authorizationResult)
+                    .get("code");
 
-        String code = parseRedirectQueryString(authorizationResult)
-                .get("code");
+            MvcResult tokenResult = performTokenRequest(clientId, redirectUri, codeVerifier, code)
+                    .andReturn();
 
-        MvcResult tokenResult = performTokenRequest(clientId, redirectUri, codeVerifier, code)
-                .andReturn();
+            String accessTokenValue = jwtDecoder
+                    .decode((String) parsePayloadFields(tokenResult).get("access_token"))
+                    .getTokenValue();
 
-        String accessTokenValue = jwtDecoder
-                .decode((String) parsePayloadFields(tokenResult).get("access_token"))
-                .getTokenValue();
+            // when & then
+            mockMvc
+                    .perform(
+                            post("/oauth2/revoke")
+                                    .contentType(APPLICATION_FORM_URLENCODED)
+                                    .param("client_id", clientId)
+                                    .param("code", code)
+                                    .param("code_verifier", codeVerifier)
+                                    .param("grant_type", "authorization_code")
+                                    .param("redirect_uri", redirectUri)
+                                    .param("token", accessTokenValue)
+                    )
+                    .andExpect(status().isOk())
+                    .andDo(print());
+        }
 
-        // when & then
-        mockMvc
-                .perform(
-                        get("/userinfo")
-                                .header(AUTHORIZATION, "Bearer " + accessTokenValue)
-                )
-                .andExpect(status().isOk())
-                .andDo(print())
-                .andDo(
-                        document(
-                                "userinfo",
-                                REQUEST_PREPROCESSOR,
-                                RESPONSE_PREPROCESSOR,
-                                requestHeaders(
-                                        headerWithName(AUTHORIZATION).description("Bearer {access_token}")
-                                ),
-                                responseHeaders(
-                                        headerWithName(CONTENT_TYPE).description(CONTENT_TYPE)
-                                ),
-                                responseFields(
-                                        fieldWithPath("sub").description("인가 요청자")
-                                )
-                        )
-                );
+        @Test
+        @DisplayName(value = "userinfo")
+        void userinfo() throws Exception {
+            // given
+            String clientId = publicClient.getClientId();
+            String redirectUri = publicClient.getRedirectUris().stream().findFirst().orElseThrow();
+            String scope = join(" ", publicClient.getScopes());
+            String codeVerifier = generateCodeVerifier();
+            String codeChallenge = generateCodeChallenge(codeVerifier);
+            String state = randomUUID().toString();
+            String nonce = randomUUID().toString();
+
+            MvcResult authorizationResult = performAuthorizationRequest(clientId, redirectUri, scope, codeChallenge, state, nonce)
+                    .andReturn();
+
+            String code = parseRedirectQueryString(authorizationResult)
+                    .get("code");
+
+            MvcResult tokenResult = performTokenRequest(clientId, redirectUri, codeVerifier, code)
+                    .andReturn();
+
+            String accessTokenValue = jwtDecoder
+                    .decode((String) parsePayloadFields(tokenResult).get("access_token"))
+                    .getTokenValue();
+
+            // when & then
+            mockMvc
+                    .perform(
+                            get("/userinfo")
+                                    .header(AUTHORIZATION, "Bearer " + accessTokenValue)
+                    )
+                    .andExpect(status().isOk())
+                    .andDo(print());
+        }
+
     }
 
     static RegisteredClient createOauth2PublicClient() {
@@ -387,6 +582,21 @@ class Oauth2AuthorizationTest extends IntegrationTestContext {
                                 .requireAuthorizationConsent(false)
                                 .build()
                 )
+                .build();
+    }
+
+    static User createUser() {
+        return User
+                .builder()
+                .email(testUsername)
+                .password("{noop}test1234")
+                .name("테스트")
+                .birth(LocalDate.now())
+                .genderType(MALE)
+                .howJoin("테스트를 위한 계정입니다.")
+                .lastAccess(LocalDateTime.now())
+                .phone("01031157613")
+                .regDate(LocalDateTime.now())
                 .build();
     }
 

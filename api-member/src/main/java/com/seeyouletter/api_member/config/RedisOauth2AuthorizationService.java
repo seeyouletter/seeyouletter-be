@@ -1,17 +1,13 @@
 package com.seeyouletter.api_member.config;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import com.seeyouletter.api_member.auth.config.CustomAuthorization;
+import com.seeyouletter.api_member.auth.config.CustomAuthorization.CustomAuthorizationBuilder;
+import com.seeyouletter.api_member.auth.config.CustomAuthorizationMixIn;
+import com.seeyouletter.api_member.auth.config.CustomOAuth2User;
+import com.seeyouletter.api_member.auth.config.CustomOauth2UserMixIn;
 import org.springframework.dao.DataRetrievalFailureException;
-import org.springframework.data.annotation.Id;
 import org.springframework.data.redis.connection.RedisStringCommands;
 import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -33,19 +29,11 @@ import org.springframework.util.Assert;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.Duration;
-import java.time.Instant;
-import java.util.Map;
-import java.util.Set;
 
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.ANY;
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.NONE;
-import static com.fasterxml.jackson.annotation.JsonTypeInfo.Id.CLASS;
 import static java.lang.String.format;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.security.MessageDigest.getInstance;
 import static java.time.temporal.ChronoUnit.MINUTES;
-import static lombok.AccessLevel.PRIVATE;
-import static lombok.AccessLevel.PROTECTED;
 import static org.springframework.data.redis.connection.RedisStringCommands.SetOption.UPSERT;
 import static org.springframework.data.redis.core.types.Expiration.from;
 import static org.springframework.security.jackson2.SecurityJackson2Modules.getModules;
@@ -78,7 +66,8 @@ public final class RedisOauth2AuthorizationService implements OAuth2Authorizatio
     private final ObjectMapper objectMapper = new ObjectMapper()
             .registerModules(getModules(this.getClass().getClassLoader()))
             .registerModule(new OAuth2AuthorizationServerJackson2Module())
-            .addMixIn(Authorization.class, AuthorizationMixIn.class);
+            .addMixIn(CustomAuthorization.class, CustomAuthorizationMixIn.class)
+            .addMixIn(CustomOAuth2User.class, CustomOauth2UserMixIn.class);
 
     private final RegisteredClientRepository registeredClientRepository;
 
@@ -336,7 +325,7 @@ public final class RedisOauth2AuthorizationService implements OAuth2Authorizatio
         return getClientRefreshTokenTimeToLive(registeredClient);
     }
 
-    private OAuth2Authorization toObject(Authorization entity) {
+    private OAuth2Authorization toObject(CustomAuthorization entity) {
         OAuth2Authorization.Builder builder = OAuth2Authorization
                 .withRegisteredClient(findClientByRegisteredClientId(entity.getRegisteredClientId()))
                 .id(entity.getId())
@@ -395,8 +384,8 @@ public final class RedisOauth2AuthorizationService implements OAuth2Authorizatio
         return builder.build();
     }
 
-    private Authorization toEntity(OAuth2Authorization authorization) {
-        Authorization.AuthorizationBuilder builder = Authorization
+    private CustomAuthorization toEntity(OAuth2Authorization authorization) {
+        CustomAuthorizationBuilder builder = CustomAuthorization
                 .builder()
                 .id(authorization.getId())
                 .registeredClientId(authorization.getRegisteredClientId())
@@ -489,7 +478,7 @@ public final class RedisOauth2AuthorizationService implements OAuth2Authorizatio
         }
 
         try {
-            return toObject(objectMapper.readValue(json, Authorization.class));
+            return toObject(objectMapper.readValue(json, CustomAuthorization.class));
         } catch (JsonProcessingException e) {
             throw new IllegalArgumentException(e.getMessage(), e);
         }
@@ -517,82 +506,6 @@ public final class RedisOauth2AuthorizationService implements OAuth2Authorizatio
         }
 
         return stringBuilder.toString();
-    }
-
-    @Getter
-    @Builder
-    @NoArgsConstructor(access = PROTECTED)
-    @AllArgsConstructor(access = PRIVATE)
-    public static class Authorization {
-
-        @Id
-        private String id;
-
-        private String registeredClientId;
-
-        private String principalName;
-
-        private String authorizationGrantType;
-
-        private Set<String> authorizedScopes;
-
-        private Map<String, Object> attributes;
-
-        private String state;
-
-        private String authorizationCodeValue;
-
-        private Instant authorizationCodeIssuedAt;
-
-        private Instant authorizationCodeExpiresAt;
-
-        private Map<String, Object> authorizationCodeMetadata;
-
-        private String accessTokenValue;
-
-        private Instant accessTokenIssuedAt;
-
-        private Instant accessTokenExpiresAt;
-
-        private Map<String, Object> accessTokenMetadata;
-
-        private String accessTokenType;
-
-        private Set<String> accessTokenScopes;
-
-        private String refreshTokenValue;
-
-        private Instant refreshTokenIssuedAt;
-
-        private Instant refreshTokenExpiresAt;
-
-        private Map<String, Object> refreshTokenMetadata;
-
-        private String oidcIdTokenValue;
-
-        private Instant oidcIdTokenIssuedAt;
-
-        private Instant oidcIdTokenExpiresAt;
-
-        private Map<String, Object> oidcIdTokenMetadata;
-
-        private Map<String, Object> oidcIdTokenClaims;
-
-    }
-
-    @JsonTypeInfo(use = CLASS)
-    @JsonAutoDetect(
-            fieldVisibility = ANY,
-            getterVisibility = NONE,
-            isGetterVisibility = NONE
-    )
-    @JsonIgnoreProperties(ignoreUnknown = true)
-    public static abstract class AuthorizationMixIn {
-
-        @JsonCreator
-        AuthorizationMixIn() {
-        }
-
     }
 
 }

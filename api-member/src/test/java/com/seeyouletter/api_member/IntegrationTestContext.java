@@ -82,6 +82,7 @@ public abstract class IntegrationTestContext {
                         "X-XSS-Protection",
                         "X-Frame-Options",
                         "Pragma",
+                        VARY,
                         CACHE_CONTROL,
                         EXPIRES,
                         CONTENT_LENGTH

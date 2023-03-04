@@ -2,6 +2,7 @@ package com.seeyouletter.api_member.auth.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.seeyouletter.api_member.auth.config.CustomOAuth2User;
 import com.seeyouletter.api_member.auth.value.KakaoAttributes;
 import com.seeyouletter.api_member.auth.value.NaverAttributes;
 import com.seeyouletter.api_member.auth.value.OauthAttributes;
@@ -11,6 +12,7 @@ import com.seeyouletter.domain_member.repository.OauthUserRepository;
 import com.seeyouletter.domain_member.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
+import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
@@ -29,8 +31,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
     private final OauthUserRepository oauthUserRepository;
 
-    private static final String CANNOT_FIND_PROVIDER = "connot find provider";
-
+    private static final String CANNOT_FIND_PROVIDER = "cannot find provider";
 
     private final ObjectMapper objectMapper = new Jackson2ObjectMapperBuilder()
             .propertyNamingStrategy(PropertyNamingStrategies.SNAKE_CASE)
@@ -46,12 +47,18 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
                 .getRegistrationId();
 
         OauthAttributes oauthAttributes = mapToAttributes(provider, oAuth2User.getAttributes());
-        isNewInsert(oauthAttributes.convertOauthUser());
+        OauthUser oauthUser = oauthAttributes.convertOauthUser();
+        isNewInsert(oauthUser);
 
-        return oAuth2User;
+        return new CustomOAuth2User(
+                AuthorityUtils.NO_AUTHORITIES,
+                oAuth2User.getAttributes(),
+                oauthUser.getUser().getEmail()
+        );
     }
 
     public void isNewInsert(OauthUser oauthUser) {
+
         Optional<OauthUser> optionalOauthUser = oauthUserRepository.findByOauthId(oauthUser.getOauthId());
 
         if (optionalOauthUser.isPresent()) {

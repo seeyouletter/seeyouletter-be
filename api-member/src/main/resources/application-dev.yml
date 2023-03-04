@@ -1,5 +1,6 @@
 server:
   port: 8600
+  forward-headers-strategy: native
 
 spring:
   datasource:
@@ -9,7 +10,7 @@ spring:
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: validate
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
@@ -26,11 +27,11 @@ spring:
       client:
         registration:
           naver:
-            clientId: JQVLu74QpBZbothfyFs9
-            clientSecret: ENC(FSm1doVFr2RG97uyspaJpI9/qkAl21mz)
+            clientId: g0bylVi7uVVNgMMZLVDM
+            clientSecret: ENC(8bcU3cyY5Q2MX5f+S9ThJiNJ7e4ghBhJ)
             clientAuthenticationMethod: post
             authorizationGrantType: authorization_code
-            redirectUri: http://localhost:8600/login/oauth2/code/naver
+            redirectUri: https://dev-member.seeyouletter.kr/login/oauth2/code/naver
             scope:
               - nickname
               - email
@@ -41,11 +42,11 @@ spring:
               - mobile
             clientName: Naver
           kakao:
-            clientId: 77b675771f4b505fae6f51e25086e80f
-            clientSecret: ENC(rNGXN3onQN+TLtHB+a8HTD6l6aF5Jj0m3UNdOjwqoGFeJ3O/OygGA3gg+smPZKR7)
+            clientId: e860223901e9152978e1ec2754505445
+            clientSecret: ENC(1I/cNlCx47qp0++4yLUpsPZ2rVEhNCN9n1MI4pMlN0Ez0nToUbhtuMAgBVpmb7Dv)
             clientAuthenticationMethod: post
             authorizationGrantType: authorization_code
-            redirectUri: http://localhost:8600/login/oauth2/code/kakao
+            redirectUri: https://dev-member.seeyouletter.kr/login/oauth2/code/kakao
             scope:
               - profile_nickname
               - account_email
