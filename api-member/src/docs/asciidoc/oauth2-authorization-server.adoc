@@ -10,9 +10,21 @@ ifndef::snippets[]
 :snippets: ./build/generated-snippets
 endif::[]
 
+== 설명
 seeyouletter 서비스를 구성하는 웹 애플리케이션들의 인증 및 인가를 처리하는 인증 서버는 `Oauth2`, `OIDC` 를 구현합니다. 리소스 서버는 인증 서버에서 발급한 엑세스 토큰으로 권한에 대한 인가를 수행할 수 있습니다. 인증 서버는 `third-party` 가 아닌 `first-party` 클라이언트에서의 사용이 목적이므로 클라이언트를 등록하는 엔드포인트는 제외되었습니다.
 
 NOTE: 2023-01-25 작성일 기준으로 `public-client` 인 SPA에서만 서비스를 지원하는 시점에서 작성된 문서입니다.
+
+=== Error Response
+|===
+| Name | Required | Description
+
+| error | true | 에러 유형
+| error_description | false | 에러에 대한 정보
+| error_uri | false | 에러에 대한 졍보를 포함한 웹 페이지 URI
+|===
+
+`Oauth2 Error Response` 에 대해서는 link:https://openid.net/specs/openid-connect-core-1_0.html#UserInfoResponse[해당 문서]를 참고해주세요.
 
 [[authorization]]
 == 인가
@@ -32,7 +44,7 @@ NOTE: 2023-01-25 작성일 기준으로 `public-client` 인 SPA에서만 서비�
 | address | 주소(OIDC scope)
 |===
 
-`OIDC` scope에 대해서는 link:https://openid.net/specs/openid-connect-core-1_0.html#UserInfoResponse[해당 문서]를 참고해주세요.
+`OIDC scope` 에 대해서는 link:https://openid.net/specs/openid-connect-core-1_0.html#UserInfoResponse[해당 문서]를 참고해주세요.
 
 === HTTP request
 include::{snippets}/authorization/http-request.adoc[]
@@ -118,7 +130,7 @@ include::{snippets}/revoke/http-response.adoc[]
 
 인증 서버에서 토큰을 발급한 유저의 정보를 조회합니다.
 
-`OIDC` standard claims에 대해서는 link:https://openid.net/specs/openid-connect-core-1_0.html#StandardClaims[해당 문서]를 참고해주세요.
+`OIDC standard claims` 에 대해서는 link:https://openid.net/specs/openid-connect-core-1_0.html#StandardClaims[해당 문서]를 참고해주세요.
 
 NOTE: 유저 정보에 대한 명세를 구체화함에 따라 응답 필드는 지속적으로 추가될 수 있습니다.
 
