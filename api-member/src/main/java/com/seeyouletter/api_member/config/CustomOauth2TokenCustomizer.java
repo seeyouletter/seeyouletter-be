@@ -3,6 +3,7 @@ package com.seeyouletter.api_member.config;
 import com.seeyouletter.api_member.service.UserService;
 import com.seeyouletter.domain_member.entity.User;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.oidc.OidcUserInfo;
 import org.springframework.security.oauth2.jwt.JwtClaimsSet;
 import org.springframework.security.oauth2.server.authorization.token.JwtEncodingContext;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.Map;
 
+import static org.springframework.security.oauth2.core.OAuth2ErrorCodes.SERVER_ERROR;
 import static org.springframework.security.oauth2.core.oidc.StandardClaimNames.PHONE_NUMBER_VERIFIED;
 import static org.springframework.security.oauth2.core.oidc.endpoint.OidcParameterNames.ID_TOKEN;
 import static org.springframework.security.oauth2.server.authorization.OAuth2TokenType.ACCESS_TOKEN;
@@ -24,38 +26,43 @@ public class CustomOauth2TokenCustomizer implements OAuth2TokenCustomizer<JwtEnc
 
     @Override
     public void customize(JwtEncodingContext context) {
-        JwtClaimsSet.Builder claims = context.getClaims();
+        try {
+            JwtClaimsSet.Builder claims = context.getClaims();
 
-        String email = context
-                .getPrincipal()
-                .getName();
+            String email = context
+                    .getPrincipal()
+                    .getName();
 
-        if (context.getTokenType().equals(ACCESS_TOKEN)) {
-            claims.claim("sub", email);
+            if (context.getTokenType().equals(ACCESS_TOKEN)) {
+                claims.claim("sub", email);
 
-            return;
-        }
+                return;
+            }
 
-        if (context.getTokenType().getValue().equals(ID_TOKEN)) {
-            User user = userService.findByEmail(email);
+            if (context.getTokenType().getValue().equals(ID_TOKEN)) {
+                User user = userService.findByEmail(email);
 
-            Map<String, Object> oidcClaims = OidcUserInfo
-                    .builder()
-                    .subject(user.getEmail())
-                    .preferredUsername(email) // TODO 사용되는 이름으로 변경
-                    .name(user.getName())
-                    .nickname(user.getName()) // TODO 닉네임으로 변경
-                    .profile(getProfile(user))
-                    .birthdate(getBirthdate(user))
-                    .gender(user.getGenderType().name())
-                    .email(user.getEmail())
-                    .emailVerified(getEmailVerified(user))
-                    .phoneNumber(getPhone(user))
-                    .claim(PHONE_NUMBER_VERIFIED, getPhoneVerified(user))
-                    .build()
-                    .getClaims();
+                Map<String, Object> oidcClaims = OidcUserInfo
+                        .builder()
+                        .subject(user.getEmail())
+                        .preferredUsername(email) // TODO 사용되는 이름으로 변경
+                        .name(user.getName())
+                        .nickname(user.getName()) // TODO 닉네임으로 변경
+                        .profile(getProfile(user))
+                        .birthdate(getBirthdate(user))
+                        .gender(user.getGenderType().name())
+                        .email(user.getEmail())
+                        .emailVerified(getEmailVerified(user))
+                        .phoneNumber(getPhone(user))
+                        .claim(PHONE_NUMBER_VERIFIED, getPhoneVerified(user))
+                        .build()
+                        .getClaims();
 
-            claims.claims(i -> i.putAll(oidcClaims));
+                claims.claims(i -> i.putAll(oidcClaims));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new OAuth2AuthenticationException(SERVER_ERROR);
         }
     }
 
