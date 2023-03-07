@@ -1,7 +1,7 @@
 package com.seeyouletter.api_member.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.seeyouletter.api_member.auth.config.CustomHttpConfigurer;
+import com.seeyouletter.api_member.auth.config.RestLoginHttpConfigurer;
 import com.seeyouletter.api_member.auth.config.RestAuthenticationProcessingFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -31,7 +31,7 @@ public class SecurityConfiguration {
                 .oauth2Login();
 
         httpSecurity
-                .apply(new CustomHttpConfigurer(objectMapper));
+                .apply(new RestLoginHttpConfigurer(objectMapper));
 
         httpSecurity
                 .cors()

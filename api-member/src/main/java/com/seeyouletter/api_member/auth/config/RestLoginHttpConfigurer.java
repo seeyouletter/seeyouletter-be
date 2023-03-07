@@ -6,11 +6,11 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-public class CustomHttpConfigurer extends AbstractHttpConfigurer<CustomHttpConfigurer, HttpSecurity> {
+public class RestLoginHttpConfigurer extends AbstractHttpConfigurer<RestLoginHttpConfigurer, HttpSecurity> {
 
     private final ObjectMapper objectMapper;
 
-    public CustomHttpConfigurer(ObjectMapper objectMapper) {
+    public RestLoginHttpConfigurer(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
     }
 
