@@ -1,6 +1,7 @@
 package com.seeyouletter.api_member.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.seeyouletter.api_member.auth.config.RestLoginHttpConfigurer;
 import com.seeyouletter.api_member.auth.config.RestAuthenticationProcessingFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -13,7 +14,6 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import static com.seeyouletter.api_member.auth.config.CustomHttpConfigurer.customHttpConfigurer;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 
@@ -25,11 +25,13 @@ public class SecurityConfiguration {
 
     @Bean
     public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity httpSecurity) throws Exception {
+
+
         httpSecurity
                 .oauth2Login();
 
         httpSecurity
-                .apply(customHttpConfigurer(objectMapper));
+                .apply(new RestLoginHttpConfigurer(objectMapper));
 
         httpSecurity
                 .cors()
@@ -45,7 +47,6 @@ public class SecurityConfiguration {
                 .and()
                 .formLogin()
                 .loginProcessingUrl("/form/login")
-                .defaultSuccessUrl("/")
                 .usernameParameter("email");
 
         return httpSecurity.build();
