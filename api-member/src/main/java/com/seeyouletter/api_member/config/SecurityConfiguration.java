@@ -17,25 +17,17 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import java.util.List;
-
-import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfiguration {
 
-    private static final List<String> FIRST_PARTY_CLIENT_ORIGINS = asList(
-            "http://localhost:2462",
-            "http://127.0.0.1:2462",
-            "https://seeyouletter.kr",
-            "https://www.seeyouletter.kr"
-    );
-
     private final ObjectMapper objectMapper;
 
     private final ClientRegistrationRepository clientRegistrationRepository;
+
+    private final FirstPartyClientProperties firstPartyClientProperties;
 
     @Bean
     public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity httpSecurity) throws Exception {
@@ -72,7 +64,7 @@ public class SecurityConfiguration {
                 .addFilterBefore(
                         new Oauth2ClientAuthorizationRequestSaveContinueUrlFilter(
                                 clientRegistrationRepository,
-                                FIRST_PARTY_CLIENT_ORIGINS
+                                firstPartyClientProperties.getOrigins()
                         ),
                         OAuth2AuthorizationRequestRedirectFilter.class
                 );
@@ -86,7 +78,7 @@ public class SecurityConfiguration {
         configuration.setAllowedMethods(singletonList("*"));
         configuration.setExposedHeaders(singletonList("*"));
         configuration.setAllowCredentials(true);
-        configuration.setAllowedOrigins(FIRST_PARTY_CLIENT_ORIGINS);
+        configuration.setAllowedOrigins(firstPartyClientProperties.getOrigins());
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
 

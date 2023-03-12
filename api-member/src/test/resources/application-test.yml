@@ -64,6 +64,12 @@ spring:
             userInfoUri: https://kapi.kakao.com/v2/user/me
             userNameAttribute: id
 
+first:
+  party:
+    client:
+      origins:
+        - http://localhost:8080
+
 aws:
   s3:
     region: test
