@@ -67,6 +67,15 @@ spring:
             userInfoUri: https://kapi.kakao.com/v2/user/me
             userNameAttribute: id
 
+first:
+  party:
+    client:
+      origins:
+        - http://localhost:2462,
+        - http://127.0.0.1:2462,
+        - https://seeyouletter.kr,
+        - https://www.seeyouletter.kr
+
 aws:
   s3:
     region: ap-northeast-2
