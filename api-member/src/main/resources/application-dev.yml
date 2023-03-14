@@ -71,9 +71,9 @@ first:
   party:
     client:
       origins:
-        - http://localhost:2462,
-        - http://127.0.0.1:2462,
-        - https://seeyouletter.kr,
+        - http://localhost:2462
+        - http://127.0.0.1:2462
+        - https://seeyouletter.kr
         - https://www.seeyouletter.kr
 
 aws:
