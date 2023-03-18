@@ -4,10 +4,7 @@ import com.seeyouletter.api_member.IntegrationTestContext;
 import com.seeyouletter.api_member.auth.value.LoginRequest;
 import com.seeyouletter.domain_member.entity.User;
 import com.seeyouletter.domain_member.repository.UserRepository;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -20,7 +17,6 @@ import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuild
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@Nested
 @DisplayName("Rest API 로그인")
 class RestAuthenticationTest extends IntegrationTestContext {
 
@@ -98,6 +94,11 @@ class RestAuthenticationTest extends IntegrationTestContext {
                 .phone("01031157613")
                 .regDate(LocalDateTime.now())
                 .build();
+    }
+
+    @AfterAll
+    static void deleteUser(@Autowired UserRepository userRepository){
+        userRepository.deleteAllInBatch();
     }
 
 }
