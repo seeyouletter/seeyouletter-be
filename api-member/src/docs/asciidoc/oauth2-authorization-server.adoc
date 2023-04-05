@@ -1,4 +1,4 @@
-= Oauth2 Authorization Server REST API Document
+= Oauth2 Authorization Server API
 :doctype: book
 :icons: font
 :source-highlighter: highlightjs
@@ -16,6 +16,18 @@ seeyouletter 서비스를 구성하는 웹 애플리케이션들의 인증 및 �
 NOTE: 2023-01-25 작성일 기준으로 `public-client` 인 SPA에서만 서비스를 지원하는 시점에서 작성된 문서입니다.
 
 === Error Response
+
+[source,http,options="nowrap"]
+----
+HTTP/1.1 400 Bad Request
+Content-Type: application/json;charset=UTF-8
+
+{
+  "error_description" : "OAuth 2.0 Parameter: grant_type",
+  "error" : "unsupported_grant_type",
+  "error_uri" : "https://datatracker.ietf.org/doc/html/rfc6749#section-5.2"
+}
+----
 |===
 | Name | Required | Description
 
@@ -47,16 +59,50 @@ NOTE: 2023-01-25 작성일 기준으로 `public-client` 인 SPA에서만 서비�
 `OIDC scope` 에 대해서는 link:https://openid.net/specs/openid-connect-core-1_0.html#UserInfoResponse[해당 문서]를 참고해주세요.
 
 === HTTP request
-include::{snippets}/authorization/http-request.adoc[]
+include::{snippets}/authorization/authorization/http-request.adoc[]
 
 === Request parameters
-include::{snippets}/authorization/request-parameters.adoc[]
+include::{snippets}/authorization/authorization/request-parameters.adoc[]
 
 === HTTP response
-include::{snippets}/authorization/http-response.adoc[]
+include::{snippets}/authorization/authorization/http-response.adoc[]
 
 === Request headers
-include::{snippets}/authorization/response-headers.adoc[]
+include::{snippets}/authorization/authorization/response-headers.adoc[]
+
+=== Error Response
+
+인가 요청에서 발생하는 에러에 대한 처리는 유효하지 않은 파라미터에 따라 다릅니다. 인가 요청시에 전달한 `client_id`, `redirect_uri` 파라미터가 유효하지 않아도 리다이렉트를 하게되면 공격자의 페이지로 리다이렉트를 유도할 수 있게되므로 리다이렉트를 하지 않고 인증 서버에서 에러 페이지를 응답합니다. 자세한 내용은 link:https://www.rfc-editor.org/rfc/rfc6749#section-10.15[해당 문서]를 참고해주세요.
+
+==== 입력되지 않거나 유효하지 않은 client_id 파라미터로 요청한 경우
+[source,http,options="nowrap"]
+----
+HTTP/1.1 400 Bad Request
+
+(400 HTML 에러 페이지)
+----
+
+==== 입력되지 않거나 유효하지 않은 redirect_uri 파라미터로 요청한 경우
+[source,http,options="nowrap"]
+----
+HTTP/1.1 400 Bad Request
+
+(400 HTML 에러 페이지)
+----
+
+==== 입력되지 않거나 유효하지 않은 response_type 파라미터로 요청한 경우
+[source,http,options="nowrap"]
+----
+HTTP/1.1 400 Bad Request
+
+(400 HTML 에러 페이지)
+----
+
+==== 유효하지 않은 scope 파라미터로 요청한 경우
+include::{snippets}/authorization/fail-authorization-when-invalid-scope/http-response.adoc[]
+
+==== 입력되지 않거나 유효하지 않은 code_challenge 파라미터로 요청한 경우
+include::{snippets}/authorization/fail-authorization-when-invalid-or-empty-code-challenge-method/http-response.adoc[]
 
 [[token]]
 == 토큰 발급
@@ -66,22 +112,46 @@ include::{snippets}/authorization/response-headers.adoc[]
 인가 요청의 응답에서 리다이렉트된 경로에 포함된 접근 토큰인 `code` 로 엑세스 토큰 발급을 요청합니다.
 
 === HTTP request
-include::{snippets}/token/http-request.adoc[]
+include::{snippets}/token/token/http-request.adoc[]
 
 === Request headers
-include::{snippets}/token/request-headers.adoc[]
+include::{snippets}/token/token/request-headers.adoc[]
 
 === Request parameters
-include::{snippets}/token/request-parameters.adoc[]
+include::{snippets}/token/token/request-parameters.adoc[]
 
 === HTTP response
-include::{snippets}/token/http-response.adoc[]
+include::{snippets}/token/token/http-response.adoc[]
 
 === Request headers
-include::{snippets}/token/response-headers.adoc[]
+include::{snippets}/token/token/response-headers.adoc[]
 
 === Response fields
-include::{snippets}/token/response-fields.adoc[]
+include::{snippets}/token/token/response-fields.adoc[]
+
+=== Error Response
+
+==== 입력되지 않은 client_id 파라미터로 요청한 경우
+include::{snippets}/token/fail-token-when-empty-client-id/http-response.adoc[]
+
+==== 유효하지 않은 client_id 파라미터로 요청한 경우
+include::{snippets}/token/fail-token-when-invalid-client-id/http-response.adoc[]
+
+==== 입력되지 않거나 입력되지 않거나 유효하지 않은 redirect_uri 파라미터로 요청한 경우
+include::{snippets}/token/fail-token-when-invalid-or-empty-redirect-uri/http-response.adoc[]
+
+==== 입력되지 않거나 입력되지 않거나 유효하지 않은 code_verifier 파라미터로 요청한 경우
+include::{snippets}/token/fail-token-when-invalid-or-empty-code-verifier/http-response.adoc[]
+
+==== 입력되지 않은 authorization_code 파라미터로 요청한 경우
+include::{snippets}/token/fail-token-when-empty-authorization-code/http-response.adoc[]
+
+==== 유효하지 않은 authorization_code 파라미터로 요청한 경우
+include::{snippets}/token/fail-token-when-invalid-authorization-code/http-response.adoc[]
+
+==== 입력되지 않거나 입력되지 않거나 유효하지 않은 grant_type 파라미터로 요청한 경우
+include::{snippets}/token/fail-token-when-invalid-or-empty-grant-type/http-response.adoc[]
+
 
 [[introspect]]
 == 토큰 정보
@@ -89,41 +159,81 @@ include::{snippets}/token/response-fields.adoc[]
 인증 서버에서 발급한 엑세스 토큰에 대한 정보를 조회합니다.
 
 === HTTP request
-include::{snippets}/introspect/http-request.adoc[]
+include::{snippets}/introspect/introspect/http-request.adoc[]
 
 === Request headers
-include::{snippets}/introspect/request-headers.adoc[]
+include::{snippets}/introspect/introspect/request-headers.adoc[]
 
 === Request parameters
-include::{snippets}/introspect/request-parameters.adoc[]
+include::{snippets}/introspect/introspect/request-parameters.adoc[]
 
 === HTTP response
-include::{snippets}/introspect/http-response.adoc[]
+include::{snippets}/introspect/introspect/http-response.adoc[]
 
 === Request headers
-include::{snippets}/introspect/response-headers.adoc[]
+include::{snippets}/introspect/introspect/response-headers.adoc[]
 
 === Response fields
-include::{snippets}/introspect/response-fields.adoc[]
+include::{snippets}/introspect/introspect/response-fields.adoc[]
+
+=== Error Response
+
+==== 입력되지 않은 client_id 파라미터로 요청한 경우
+include::{snippets}/introspect/fail-introspect-when-empty-client-id/http-response.adoc[]
+
+==== 유효하지 않은 client_id 파라미터로 요청한 경우
+include::{snippets}/introspect/fail-introspect-when-invalid-client-id/http-response.adoc[]
+
+==== 입력되지 않거나 유효하지 않은 code-verifier 파라미터로 요청한 경우
+include::{snippets}/introspect/fail-introspect-when-invalid-or-empty-code-verifier/http-response.adoc[]
+
+==== 입력되지 않거나 유효하지 않은 grant_type 파라미터로 요청한 경우
+include::{snippets}/introspect/fail-introspect-when-invalid-or-empty-grant-type/http-response.adoc[]
+
+==== 입력되지 않은 access_token 파라미터로 요청한 경우
+include::{snippets}/introspect/fail-introspect-when-empty-access-token/http-response.adoc[]
+
+==== 유효하지 않은 access_token 파라미터로 요청한 경우
+include::{snippets}/introspect/fail-introspect-when-invalid-access-token/http-response.adoc[]
+
 
 [[revoke]]
 == 토큰 무효화
 
 인증 서버에서 발급한 엑세스 토큰을 무효화합니다.
 
+유효하지 않은 토큰을 무효화 요청하더라도 에러가 발생하지는 않습니다.
+
 NOTE: JWT 토큰은 `self-contained` 특성을 가지기 때문에 인증 서버에서 무효화하더라도 서명이 일치하고 유효기간이 지나지 않았다면 리소스 서버에서는 유효한 토큰으로 인식할 수 있습니다.
 
 === HTTP request
-include::{snippets}/revoke/http-request.adoc[]
+include::{snippets}/revoke/revoke/http-request.adoc[]
 
 === Request headers
-include::{snippets}/revoke/request-headers.adoc[]
+include::{snippets}/revoke/revoke/request-headers.adoc[]
 
 === Request parameters
-include::{snippets}/revoke/request-parameters.adoc[]
+include::{snippets}/revoke/revoke/request-parameters.adoc[]
 
 === HTTP response
-include::{snippets}/revoke/http-response.adoc[]
+include::{snippets}/revoke/revoke/http-response.adoc[]
+
+=== Error Response
+
+==== 입력되지 않은 client_id 파라미터로 요청한 경우
+include::{snippets}/revoke/fail-revoke-when-empty-client-id/http-response.adoc[]
+
+==== 유효하지 않은 client_id 파라미터로 요청한 경우
+include::{snippets}/revoke/fail-revoke-when-invalid-client-id/http-response.adoc[]
+
+==== 입력되지 않거나 유효하지 않은 code_verifier 파라미터로 요청한 경우
+include::{snippets}/revoke/fail-revoke-when-invalid-or-empty-code-verifier/http-response.adoc[]
+
+==== 입력되지 않거나 유효하지 않은 grant_type 파라미터로 요청한 경우
+include::{snippets}/revoke/fail-revoke-when-invalid-or-empty-grant-type/http-response.adoc[]
+
+==== 입력되지 않은 access_token 파라미터로 요청한 경우
+include::{snippets}/revoke/fail-revoke-when-empty-access-token/http-response.adoc[]
 
 [[userinfo]]
 == 유저 정보
@@ -135,16 +245,21 @@ include::{snippets}/revoke/http-response.adoc[]
 NOTE: 유저 정보에 대한 명세를 구체화함에 따라 응답 필드는 지속적으로 추가될 수 있습니다.
 
 === HTTP request
-include::{snippets}/userinfo/http-request.adoc[]
+include::{snippets}/userinfo/userinfo/http-request.adoc[]
 
 === Request headers
-include::{snippets}/userinfo/request-headers.adoc[]
+include::{snippets}/userinfo/userinfo/request-headers.adoc[]
 
 === HTTP response
-include::{snippets}/userinfo/http-response.adoc[]
+include::{snippets}/userinfo/userinfo/http-response.adoc[]
 
 === Request headers
-include::{snippets}/userinfo/response-headers.adoc[]
+include::{snippets}/userinfo/userinfo/response-headers.adoc[]
 
 === Response fields
-include::{snippets}/userinfo/response-fields.adoc[]
+include::{snippets}/userinfo/userinfo/response-fields.adoc[]
+
+=== Error Response
+
+==== 입력되지 않거나 유효하지 않은 access_token 파라미터로 요청한 경우
+include::{snippets}/userinfo/fail-userinfo-when-invalid-or-empty-access-token/http-response.adoc[]
