@@ -41,11 +41,13 @@ import static org.springframework.security.jackson2.SecurityJackson2Modules.getM
 import static org.springframework.security.oauth2.core.AuthorizationGrantType.AUTHORIZATION_CODE;
 import static org.springframework.security.oauth2.core.AuthorizationGrantType.CLIENT_CREDENTIALS;
 import static org.springframework.security.oauth2.core.OAuth2AccessToken.TokenType.BEARER;
+import static org.springframework.security.oauth2.core.OAuth2ErrorCodes.INVALID_REQUEST;
 import static org.springframework.security.oauth2.core.OAuth2ErrorCodes.SERVER_ERROR;
 import static org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames.CODE;
 import static org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames.STATE;
 import static org.springframework.security.oauth2.server.authorization.OAuth2TokenType.ACCESS_TOKEN;
 import static org.springframework.security.oauth2.server.authorization.OAuth2TokenType.REFRESH_TOKEN;
+import static org.springframework.util.StringUtils.hasText;
 
 public final class RedisOauth2AuthorizationService implements OAuth2AuthorizationService {
 
@@ -134,9 +136,11 @@ public final class RedisOauth2AuthorizationService implements OAuth2Authorizatio
 
     @Override
     public OAuth2Authorization findByToken(String token, OAuth2TokenType tokenType) {
-        try {
-            Assert.hasText(token, "token cannot be empty");
+        if (!hasText(token)) {
+            throw new OAuth2AuthenticationException(INVALID_REQUEST);
+        }
 
+        try {
             String authorizationId = findAuthorizationIdByTokenAndTokenType(token, tokenType);
 
             if (authorizationId == null) {
