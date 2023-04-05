@@ -6,21 +6,20 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-public class CustomHttpConfigurer extends AbstractHttpConfigurer<CustomHttpConfigurer, HttpSecurity> {
+public class RestLoginHttpConfigurer extends AbstractHttpConfigurer<RestLoginHttpConfigurer, HttpSecurity> {
 
     private final ObjectMapper objectMapper;
 
-    private CustomHttpConfigurer(ObjectMapper objectMapper) {
+    public RestLoginHttpConfigurer(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
     }
 
     @Override
     public void configure(HttpSecurity http) throws Exception {
         AuthenticationManager authenticationManager = http.getSharedObject(AuthenticationManager.class);
-        http.addFilterBefore(new RestAuthenticationProcessingFilter(authenticationManager, objectMapper), UsernamePasswordAuthenticationFilter.class);
-    }
-
-    public static CustomHttpConfigurer customHttpConfigurer(ObjectMapper objectMapper) {
-        return new CustomHttpConfigurer(objectMapper);
+        RestAuthenticationProcessingFilter newFilter = new RestAuthenticationProcessingFilter(authenticationManager, objectMapper);
+        newFilter.setAuthenticationSuccessHandler(new RestLoginSuccessHandler());
+        newFilter.setAuthenticationFailureHandler(new RestLoginFailureHandler());
+        http.addFilterBefore(newFilter, UsernamePasswordAuthenticationFilter.class);
     }
 }
