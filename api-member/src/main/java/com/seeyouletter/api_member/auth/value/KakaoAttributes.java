@@ -9,12 +9,11 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
 import java.util.Map;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class KakaoAttributes implements OauthAttributes{
+public class KakaoAttributes implements OauthAttributes {
 
     private Long id;
 
@@ -31,24 +30,21 @@ public class KakaoAttributes implements OauthAttributes{
                 .email((String) kakaoAccount.get("email"))
                 .profileImage(properties.get("profile_image"))
                 .genderType(convertGender((String) kakaoAccount.get("gender")))
-                .regDate(LocalDateTime.now())
-                .lastAccess(LocalDateTime.now())
                 .build();
 
         return new OauthUser(
-            null,
-            Long.toString(id),
-            OauthType.KAKAO,
-            user
+                Long.toString(id),
+                OauthType.KAKAO,
+                user
         );
     }
 
-    private GenderType convertGender(String gender){
-        if("male".equals(gender)){
+    private GenderType convertGender(String gender) {
+        if ("male".equals(gender)) {
             return GenderType.MALE;
         }
 
-        if("female".equals(gender)){
+        if ("female".equals(gender)) {
             return GenderType.FEMALE;
         }
 
