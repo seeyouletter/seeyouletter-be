@@ -11,4 +11,9 @@ public class DefaultController {
         return "authorized";
     }
 
+    @GetMapping(value = "/")
+    public String index() {
+        return "";
+    }
+
 }
