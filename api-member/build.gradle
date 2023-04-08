@@ -3,6 +3,7 @@ dependencies {
     implementation 'software.amazon.awssdk:s3'
     implementation project(':domain-member')
     implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.data:spring-data-redis'
     implementation 'org.springframework.security:spring-security-oauth2-authorization-server:0.4.0'
