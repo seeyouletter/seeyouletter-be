@@ -84,15 +84,15 @@ class RestAuthenticationTest extends IntegrationTestContext {
     static User createUser(PasswordEncoder passwordEncoder) {
         return User
                 .builder()
+                .name("테스트")
                 .email(testUsername)
                 .password(passwordEncoder.encode(testPassword))
-                .name("테스트")
-                .birth(LocalDate.now())
-                .genderType(MALE)
+                .profileImage("https://www.test.com/image/me")
                 .howJoin("테스트를 위한 계정입니다.")
-                .lastAccess(LocalDateTime.now())
                 .phone("01031157613")
-                .regDate(LocalDateTime.now())
+                .genderType(MALE)
+                .birth(LocalDate.now())
+                .howJoin("테스트")
                 .build();
     }
 

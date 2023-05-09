@@ -8,12 +8,11 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
 import java.util.Map;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class NaverAttributes implements OauthAttributes{
+public class NaverAttributes implements OauthAttributes {
 
     private String resultCode;
 
@@ -28,12 +27,9 @@ public class NaverAttributes implements OauthAttributes{
                 .email(response.get("email"))
                 .phone(response.get("mobile").replace("-", ""))
                 .genderType(GenderType.find(response.get("gender")))
-                .regDate(LocalDateTime.now())
-                .lastAccess(LocalDateTime.now())
                 .build();
 
         return new OauthUser(
-                null,
                 response.get("id"),
                 OauthType.NAVER,
                 user

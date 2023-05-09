@@ -67,7 +67,7 @@ include::{snippets}/authorization/authorization/request-parameters.adoc[]
 === HTTP response
 include::{snippets}/authorization/authorization/http-response.adoc[]
 
-=== Request headers
+=== Response headers
 include::{snippets}/authorization/authorization/response-headers.adoc[]
 
 === Error Response
@@ -123,7 +123,7 @@ include::{snippets}/token/token/request-parameters.adoc[]
 === HTTP response
 include::{snippets}/token/token/http-response.adoc[]
 
-=== Request headers
+=== Response headers
 include::{snippets}/token/token/response-headers.adoc[]
 
 === Response fields
@@ -170,7 +170,7 @@ include::{snippets}/introspect/introspect/request-parameters.adoc[]
 === HTTP response
 include::{snippets}/introspect/introspect/http-response.adoc[]
 
-=== Request headers
+=== Response headers
 include::{snippets}/introspect/introspect/response-headers.adoc[]
 
 === Response fields
@@ -253,7 +253,7 @@ include::{snippets}/userinfo/userinfo/request-headers.adoc[]
 === HTTP response
 include::{snippets}/userinfo/userinfo/http-response.adoc[]
 
-=== Request headers
+=== Response headers
 include::{snippets}/userinfo/userinfo/response-headers.adoc[]
 
 === Response fields

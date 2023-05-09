@@ -26,6 +26,7 @@ import org.springframework.security.oauth2.server.authorization.client.Registere
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClientRepository;
 import org.springframework.security.oauth2.server.authorization.jackson2.OAuth2AuthorizationServerJackson2Module;
 import org.springframework.util.Assert;
+import org.springframework.util.StringUtils;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -42,12 +43,11 @@ import static org.springframework.security.oauth2.core.AuthorizationGrantType.AU
 import static org.springframework.security.oauth2.core.AuthorizationGrantType.CLIENT_CREDENTIALS;
 import static org.springframework.security.oauth2.core.OAuth2AccessToken.TokenType.BEARER;
 import static org.springframework.security.oauth2.core.OAuth2ErrorCodes.INVALID_REQUEST;
-import static org.springframework.security.oauth2.core.OAuth2ErrorCodes.SERVER_ERROR;
 import static org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames.CODE;
 import static org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames.STATE;
 import static org.springframework.security.oauth2.server.authorization.OAuth2TokenType.ACCESS_TOKEN;
 import static org.springframework.security.oauth2.server.authorization.OAuth2TokenType.REFRESH_TOKEN;
-import static org.springframework.util.StringUtils.hasText;
+import static org.springframework.util.Assert.hasText;
 
 public final class RedisOauth2AuthorizationService implements OAuth2AuthorizationService {
 
@@ -88,70 +88,50 @@ public final class RedisOauth2AuthorizationService implements OAuth2Authorizatio
 
     @Override
     public void save(OAuth2Authorization authorization) {
-        try {
-            Assert.notNull(authorization, "authorization cannot be null");
+        Assert.notNull(authorization, "authorization cannot be null");
 
-            if (isAfterAccessTokenIssued(authorization)) {
-                saveAuthorizationTokens(authorization);
+        if (isAfterAccessTokenIssued(authorization)) {
+            saveAuthorizationTokens(authorization);
 
-                return;
-            }
-
-            if (isConsent(authorization)) {
-                saveAuthorizationConsentState(authorization);
-
-                return;
-            }
-
-            saveAuthorizationCode(authorization);
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new OAuth2AuthenticationException(SERVER_ERROR);
+            return;
         }
+
+        if (isConsent(authorization)) {
+            saveAuthorizationConsentState(authorization);
+
+            return;
+        }
+
+        saveAuthorizationCode(authorization);
     }
 
     @Override
     public void remove(OAuth2Authorization authorization) {
-        try {
-            Assert.notNull(authorization, "authorization cannot be null");
+        Assert.notNull(authorization, "authorization cannot be null");
 
-            stringRedisTemplate.delete(AUTHORIZATION_KEY_PREFIX + authorization.getId());
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new OAuth2AuthenticationException(SERVER_ERROR);
-        }
+        stringRedisTemplate.delete(AUTHORIZATION_KEY_PREFIX + authorization.getId());
     }
 
     @Override
     public OAuth2Authorization findById(String id) {
-        try {
-            Assert.hasText(id, "id cannot be empty");
+        hasText(id, "id cannot be empty");
 
-            return deserialize(valueOperations.get(AUTHORIZATION_KEY_PREFIX + id));
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new OAuth2AuthenticationException(SERVER_ERROR);
-        }
+        return deserialize(valueOperations.get(AUTHORIZATION_KEY_PREFIX + id));
     }
 
     @Override
     public OAuth2Authorization findByToken(String token, OAuth2TokenType tokenType) {
-        if (!hasText(token)) {
+        if (!StringUtils.hasText(token)) {
             throw new OAuth2AuthenticationException(INVALID_REQUEST);
         }
 
-        try {
-            String authorizationId = findAuthorizationIdByTokenAndTokenType(token, tokenType);
+        String authorizationId = findAuthorizationIdByTokenAndTokenType(token, tokenType);
 
-            if (authorizationId == null) {
-                return null;
-            }
-
-            return deserialize(valueOperations.get(AUTHORIZATION_KEY_PREFIX + authorizationId));
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new OAuth2AuthenticationException(SERVER_ERROR);
+        if (authorizationId == null) {
+            return null;
         }
+
+        return deserialize(valueOperations.get(AUTHORIZATION_KEY_PREFIX + authorizationId));
     }
 
     private String findAuthorizationIdByTokenAndTokenType(String token, OAuth2TokenType tokenType) {
