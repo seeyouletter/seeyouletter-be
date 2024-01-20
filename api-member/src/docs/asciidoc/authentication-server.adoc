@@ -1,0 +1,39 @@
+= Seeyouletter Authentication Server REST API Document
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 4
+:sectlinks:
+
+ifndef::snippets[]
+:snippets: ./build/generated-snippets
+endif::[]
+
+== 설명
+인가에 필요한 엑세스 토큰을 발급하기 위해서는 인증서버의 로그인성공 후 세션 획득이 필요합니다.
+
+NOTE: 2023-03-25 작성일 기준
+
+=== Error Response
+|===
+| Name | Required | Description
+
+| error | true | 에러 유형
+| error_description | false | 에러에 대한 정보
+| error_uri | false | 에러에 대한 졍보를 포함한 웹 페이지 URI
+|===
+
+[[login]]
+== Seeyouletter 로그인
+
+인가를 위한 토큰을 발급하기전 선행되어야하는 로그인 API 문서 입니다.
+
+=== HTTP request
+include::{snippets}/login/http-request.adoc[]
+
+=== Request body
+include::{snippets}/login/request-body.adoc[]
+
+=== HTTP response
+include::{snippets}/login/http-response.adoc[]

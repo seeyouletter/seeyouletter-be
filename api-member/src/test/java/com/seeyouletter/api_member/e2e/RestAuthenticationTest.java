@@ -4,16 +4,23 @@ import com.seeyouletter.api_member.IntegrationTestContext;
 import com.seeyouletter.api_member.auth.value.LoginRequest;
 import com.seeyouletter.domain_member.entity.User;
 import com.seeyouletter.domain_member.repository.UserRepository;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import static com.seeyouletter.domain_member.enums.GenderType.MALE;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
+import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -45,7 +52,18 @@ class RestAuthenticationTest extends IntegrationTestContext {
                                 .content(objectMapper.writeValueAsBytes(loginRequest))
                 )
                 .andExpect(status().isOk())
-                .andDo(print());
+                .andDo(print())
+                .andDo(
+                        document(
+                                "login",
+                                REQUEST_PREPROCESSOR,
+                                RESPONSE_PREPROCESSOR,
+                                requestFields(
+                                        fieldWithPath("username").type(JsonFieldType.STRING).description("아이디"),
+                                        fieldWithPath("password").type(JsonFieldType.STRING).description("패스워드")
+                                )
+                        )
+                );
 
     }
 
